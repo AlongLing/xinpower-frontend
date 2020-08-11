@@ -1,5 +1,11 @@
 <template>
   <div>
+    <el-row>
+      <el-col :span="4" class="input-telephone"><el-input placeholder="请输入电话号码" v-model="addTelephone" clearable></el-input></el-col>
+      <el-col :span="4" class="input-button"><el-button type="primary" icon="el-icon-zoom-in" @click="addUser()">新增营员</el-button></el-col>
+      <el-col :span="4" class="input-telephone"><el-input placeholder="请输入电话号码" v-model="searchTelephone" clearable></el-input></el-col>
+      <el-col :span="4" class="input-button"><el-button type="primary" icon="el-icon-search">查找营员</el-button></el-col>
+    </el-row>
     <el-table v-loading="loading" :data="userlist" stripe>
       <el-table-column type="index" width="50"></el-table-column>
       <el-table-column prop="userName" label="用户名"></el-table-column>
@@ -7,7 +13,7 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="mini" @click="onEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="onDel(scope.row)">删除</el-button>
+          <el-button size="mini" type="primary" @click="onDel(scope.row)">查看详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -35,7 +41,8 @@ export default {
       loading: false,
       // 删除用户的对话框是否显示
       delDialogVisible: false,
-      info: {}
+      info: {},
+      addTelephone: ''
     }
   },
 
@@ -61,11 +68,32 @@ export default {
         }
         this.loading = false
       })
-    }
+    },
+
+    addUser() {
+      const phone = this.addTelephone
+      if(phone.length != 11) {
+        alert('电话号码格式不对')
+      } else {
+        console.log(`新增号码为: ${this.addTelephone}`)
+      }
+    },
+
+    onEdit(row) {
+      this.$router.push(`/user/edit/${row._id}`)              // 跳转到对应路由的页面
+    },
   },
 }
 </script>
 
 <style>
+  .input-telephone {
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-top: 20px;
+  }
 
+  .input-button {
+    margin-top: 20px;
+  }
 </style>

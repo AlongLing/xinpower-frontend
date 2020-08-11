@@ -45,6 +45,11 @@ export const constantRoutes = [
         // name: 'List',
         component: () => import('@/views/userlist/userlist'),
         meta: { title: '营员管理', icon: 'table' }
+      }, {
+        path: 'edit/:id',
+        component: () => import('@/views/userlist/edit'),
+        meta: { title: '编辑歌单', icon: 'table' },
+        hidden: true
       }
     ]
   },

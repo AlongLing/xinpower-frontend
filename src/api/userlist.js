@@ -10,3 +10,12 @@ export function fetchUserList(params) {
       method: 'get'
   })
 }
+
+// 根据 user id 查找用户数据
+export function fetchUserById(params) {
+  return request({
+    params,
+    url: `${baseURL}/userlist/getUserById`,
+    method: 'get'
+})
+} 

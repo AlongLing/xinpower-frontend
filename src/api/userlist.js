@@ -46,3 +46,12 @@ export function updateScore(params) {
     method: 'post'
   })
 }
+
+// 根据user _id 删除用户
+export function deleteUser(params) {
+  return request({
+    params,
+    url: `${baseURL}/userlist/deleteUser`,
+    method: 'get'
+  })
+}

@@ -29,6 +29,7 @@ import Layout from '@/layout'
  * constantRoutes
  * a base page that does not have permission requirements
  * all roles can be accessed
+ * 页面路由
  */
 export const constantRoutes = [
   {
@@ -48,7 +49,7 @@ export const constantRoutes = [
       }, {
         path: 'edit/:id',
         component: () => import('@/views/userlist/edit'),
-        meta: { title: '编辑歌单', icon: 'table' },
+        meta: { title: '编辑', icon: 'table' },
         hidden: true
       }
     ]

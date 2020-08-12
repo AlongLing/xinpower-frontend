@@ -10,6 +10,7 @@
       <el-table-column type="index" width="50"></el-table-column>
       <el-table-column prop="userName" label="用户名"></el-table-column>
       <el-table-column prop="telephone" label="电话号码"></el-table-column>
+      <el-table-column prop="score" label="可使用积分"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="mini" @click="onEdit(scope.row)">编辑</el-button>
@@ -30,7 +31,7 @@
 </template>
 
 <script>
-import { fetchUserList } from '@/api/userlist'
+import { fetchUserList, fetchUserByTelephone, addUser } from '@/api/userlist'                          // 导入对应的 api 的函数
 import scroll from '@/utils/scroll'
 
 export default {
@@ -76,6 +77,29 @@ export default {
         alert('电话号码格式不对')
       } else {
         console.log(`新增号码为: ${this.addTelephone}`)
+        fetchUserByTelephone({                                  // 根据输入的电话号码查找该电话号码是否已存在
+          telephone: phone
+        }).then((res) => {
+          if(res.data.length === 0) {
+            console.log('当前号码未注册')
+            // 插入这条记录
+            addUser({
+              telephone: phone
+            }).then((res) => {
+              if(res.code == 20000) {                           // 这个判断存疑
+                alert('新增营员成功')
+                this.addTelephone = ''
+                // 重新刷新列表数据
+                this.getUserList()
+              } else {
+                alert('新增失败，请重新尝试')
+              }
+            })
+          } else {
+            console.log('当前号码已注册')
+            alert('当前号码已存在')
+          }
+        })
       }
     },
 

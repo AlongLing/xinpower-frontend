@@ -4,7 +4,7 @@
       <el-col :span="4" class="input-telephone"><el-input placeholder="请输入电话号码" v-model="addTelephone" clearable></el-input></el-col>
       <el-col :span="4" class="input-button"><el-button type="primary" icon="el-icon-zoom-in" @click="addUser()">新增营员</el-button></el-col>
       <el-col :span="4" class="input-telephone"><el-input placeholder="请输入电话号码" v-model="searchTelephone" clearable></el-input></el-col>
-      <el-col :span="4" class="input-button"><el-button type="primary" icon="el-icon-search">查找营员</el-button></el-col>
+      <el-col :span="4" class="input-button"><el-button type="primary" icon="el-icon-search" @click="findUser()">查找营员</el-button></el-col>
     </el-row>
     <el-table v-loading="loading" :data="userlist" stripe>
       <el-table-column type="index" width="50"></el-table-column>
@@ -43,7 +43,8 @@ export default {
       // 删除用户的对话框是否显示
       delDialogVisible: false,
       info: {},
-      addTelephone: ''
+      addTelephone: '',
+      searchTelephone: ''
     }
   },
 
@@ -71,6 +72,7 @@ export default {
       })
     },
 
+    // 新增营员
     addUser() {
       const phone = this.addTelephone
       if(phone.length != 11) {
@@ -105,6 +107,28 @@ export default {
 
     onEdit(row) {
       this.$router.push(`/user/edit/${row._id}`)              // 跳转到对应路由的页面
+    },
+
+    findUser() {
+      const phone = this.searchTelephone
+      if(phone.length != 11) {
+        alert('电话号码格式不对')
+      } else {
+        console.log(`要查找电话号码为: ${phone}`)
+        fetchUserByTelephone({
+          telephone: phone
+        }).then((res) => {
+          if(res.data.length === 0) {
+            console.log('当前号码不存在')
+            this.$message.error('当前号码不存在')
+          } else {
+            console.log(`当前号码已存在: ${res.data}`)
+            console.log(`当前号码已存在: ${JSON.parse(res.data)}`)
+            this.userlist = []
+            this.userlist.push(JSON.parse(res.data))
+          }
+        })
+      }
     },
   },
 }

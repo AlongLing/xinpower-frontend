@@ -29,7 +29,7 @@ import Layout from '@/layout'
  * constantRoutes
  * a base page that does not have permission requirements
  * all roles can be accessed
- * 页面路由
+ * 页面路由,新增加的页面都需要在这个文件中添加访问的地址路由
  */
 export const constantRoutes = [
   {
@@ -75,6 +75,18 @@ export const constantRoutes = [
         path: 'orderlist',
         component: () => import('@/views/orderlist/orderlist'),
         meta: { title: '订单管理', icon: 'tree' }
+      }
+    ]
+  },
+
+  {
+    path: '/swiper',
+    component: Layout,
+    children: [
+      {
+        path: 'homelist',
+        component: () => import('@/views/swiperhome/list'),
+        meta: { title: '首页轮播图管理', icon: 'tree' }
       }
     ]
   },

@@ -86,7 +86,12 @@ export const constantRoutes = [
       {
         path: 'homelist',
         component: () => import('@/views/swiperhome/list'),
-        meta: { title: '首页轮播图管理', icon: 'tree' }
+        meta: { title: '轮播商品管理', icon: 'tree' }
+      }, {
+        path: 'addGoods',
+        component: () => import('@/views/swiperhome/addGoods'),
+        meta: { title: '新增商品', icon: 'tree' },
+        hidden: true
       }
     ]
   },

@@ -1,15 +1,6 @@
 <template>
   <div>
-    <div class="filter-container">
-      <el-upload
-        class="upload-demo"
-        action="http://localhost:3000/swiper/upload"
-        :on-success="uploadSuccess"
-        :show-file-list="false"
-      >
-        <el-button size="small" type="primary">点击上传</el-button>
-      </el-upload>
-    </div>
+    <el-button type="primary" class="add-goods-btn" @click="addGoods">新增商品</el-button>
     <el-table v-loading="loading" :data="swiperHomeList" stripe style="width: 100%">
       <el-table-column type="index" width="50"></el-table-column>
       <el-table-column label="图片" width="400">
@@ -56,10 +47,19 @@ export default {
         this.swiperHomeList = res.data
         this.loading = false
       })
+    },
+    
+    // 新增轮播页的商品
+    addGoods() {
+      this.$router.push('/swiper/addGoods')                               // 跳转到新增商品界面，需要在 router/index.js 中注册
     }
   }
 };
 </script>
 
 <style>
+  .add-goods-btn {
+    margin-top: 10px;
+    margin-left: 20px;
+  }
 </style>

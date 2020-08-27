@@ -111,6 +111,8 @@ export default {
 
     findUser() {
       const phone = this.searchTelephone
+      console.log(`swiperPictureId type = ${Object.prototype.toString.call(this.searchTelephone)}`)
+      console.log(`phone type = ${Object.prototype.toString.call(phone)}`)
       if(phone.length != 11) {
         alert('电话号码格式不对')
       } else {

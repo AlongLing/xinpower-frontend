@@ -7,3 +7,28 @@ export function fetchSwiperHomeList(){
         method: 'get'
     })
 }
+
+export function fetchBigPictureList(params) {
+    return request({
+        params,
+        url: `${baseURL}/swiper/bigPictureList`,
+        method: 'get'
+    })
+}
+
+export function fetchDetailPictureList(params) {
+    return request({
+        params,
+        url: `${baseURL}/swiper/detailPictureList`,
+        method: 'get'
+    })
+}
+
+// 删除轮播商品图片
+export function del(params) {
+    return request({
+        params,
+        url: `${baseURL}/swiper/del`,
+        method: 'get',
+    })
+}

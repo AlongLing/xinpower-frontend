@@ -7,15 +7,6 @@
       <el-form-item label="商品价格">
         <el-input v-model="newGoods.price" placeholder="请输入商品价格 格式：9999"></el-input>
       </el-form-item>
-      <el-form-item label="商品分类">
-        <el-select v-model="newGoods.type" placeholder="请选择商品分类">
-          <el-option label="户外" value="shanghai"></el-option>
-          <el-option label="数码" value="beijing"></el-option>
-          <el-option label="健康" value="beijing"></el-option>
-        </el-select>
-        <el-input class="add-new-type" placeholder="新增商品分类"></el-input>
-        <el-button type="primary" class="add-new-type-btn" @click="onCancel">新增分类</el-button>
-      </el-form-item>
       <el-form-item label="轮播图片">
         <div>
           <div class="filter-container">
@@ -23,9 +14,10 @@
             class="upload-demo"
             action="http://localhost:3000/swiper/uploadSwiperPicture"
             :on-success="uploadSwiperPictureSuccess"
+            :disabled="swiperDisabled"
             :show-file-list="false"
           >
-            <el-button size="small" type="primary">点击上传</el-button>
+            <el-button size="small" type="primary">{{swiperBtnText}}</el-button>
             <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且只能上传一张</div>
           </el-upload>
           </div>
@@ -53,10 +45,10 @@
             :show-file-list="false"
           >
             <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，推荐3到5张商品大图</div>
+            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，推荐3张商品大图</div>
           </el-upload>
           </div>
-          <el-table v-loading="loading" :data="bigPictureList" stripe style="width: 100%">
+          <el-table v-loading="bigPictureLoading" :data="bigPictureList" stripe style="width: 100%">
             <el-table-column label="图片" width="400">
               <template slot-scope="scope">
                 <img :src="scope.row.download_url" alt height="50" />
@@ -70,16 +62,52 @@
           </el-table>
         </div>
       </el-form-item>
+      <el-form-item label="详情图片">
+        <div>
+          <div class="filter-container">
+            <el-upload
+            class="upload-demo"
+            action="http://localhost:3000/swiper/uploadDetailPicture"
+            :on-success="uploadDetailPictureSuccess"
+            :show-file-list="false"
+          >
+            <el-button size="small" type="primary">点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，推荐5张商品详情图片</div>
+          </el-upload>
+          </div>
+          <el-table v-loading="detailPictureLoading" :data="detailPictureList" stripe style="width: 100%">
+            <el-table-column label="图片" width="400">
+              <template slot-scope="scope">
+                <img :src="scope.row.download_url" alt height="50" />
+              </template>
+            </el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button size="mini" type="danger" @click="onDetailPictureDelete(scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">确定</el-button>
         <el-button @click="onCancel">取消</el-button>
       </el-form-item>
     </el-form>
+
+    <!-- 确认删除的对话框 -->
+    <el-dialog title="提示" :visible.sync="delDialogVisible" width="30%">
+      <span>{{deletePictureTips}}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="doCancel">取 消</el-button>
+        <el-button type="primary" @click="doDelete">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchSwiperHomeList } from '@/api/swiper'
+import { fetchSwiperHomeList, fetchBigPictureList, fetchDetailPictureList, del } from '@/api/swiper'
 export default {
   data() {
     return {
@@ -88,9 +116,19 @@ export default {
         price: "",
         type: "",
       },
+      swiperDisabled: false,
+      swiperBtnText: '点击上传',
       swiperPicture: [],                                           // 这里用数组其实只是匹配格式，实际只用到了第一个对象
       loading: false,
-      swiperPictureId: ''                                          // 这个是上传之后的轮播图id
+      bigPictureLoading: false,
+      detailPictureLoading: false,
+      swiperPictureId: '',                                          // 这个是上传之后的轮播图id
+      bigPictureList: [],                                           // 商品大图列表
+      detailPictureList: [],                                         // 商品详情图片
+      deletePicture: {},                                             // 待删除的图片对象
+      delDialogVisible: false,
+      currentDeleteType: 0,                                          // 当前删除的图片类型，0：无类型，默认值；1：轮播图；2：商品大图；3：商品详情图片
+      deletePictureTips: ''
     }
   },
   methods: {
@@ -114,6 +152,32 @@ export default {
          }
       })
     },
+    getBigPictureList() {
+      this.bigPictureLoading = true
+      console.log(`getBigPictureList swiperPictureId = ${this.swiperPictureId}`)
+      console.log(`swiperPictureId type = ${Object.prototype.toString.call(this.swiperPictureId)}`)
+      const swiperPictureId = (this.swiperPictureId).toString()
+      console.log(`swiperPictureId = ${swiperPictureId}`)
+      console.log(`swiperPictureId type = ${Object.prototype.toString.call(swiperPictureId)}`)
+      fetchBigPictureList({
+        swiperPicId: swiperPictureId
+      }).then((res) => {
+        console.log(`getBigPictureList res = ${res}`)
+        console.log(`getBigPictureList res.data = ${res.data}`)
+        this.bigPictureList = res.data
+        this.bigPictureLoading = false
+      })
+    },
+    getDetailPictureList() {
+      this.detailPictureLoading = true
+      const swiperPictureId = (this.swiperPictureId).toString()
+      fetchDetailPictureList({
+        swiperPicId: swiperPictureId
+      }).then((res) => {
+        this.detailPictureList = res.data
+        this.detailPictureLoading = false
+      })
+    },
     uploadSwiperPictureSuccess(res) {
       if (res.id_list.length > 0) {
         this.$message({
@@ -127,7 +191,58 @@ export default {
         this.swiperPictureId = res.id_list
         console.log(`res.id_list = ${res.id_list}`)
         this.getSwiperHomeList()
+        // 将上传按钮设置为不可用
+        this.swiperDisabled = true
+        this.swiperBtnText = '已上传'
       }
+    },
+    uploadBigPictureSuccess(res) {
+      // 上传商品大图成功之后的回调函数
+      console.log(`uploadBigPictureSuccess = ${res.id_list}`)              // 这个数据返回为空，这里是更新，不同于上面的新增，也可以用swiperPictureId 来获取上传之后的大图id
+      this.getBigPictureList()
+    },
+    uploadDetailPictureSuccess(res) {
+      // 上传商品详情图片成功之后的回调函数
+      console.log(`uploadDetailPictureSuccess = ${res.id_list}`)
+      this.getDetailPictureList()
+    },
+    // 删除商品详情图片
+    onDetailPictureDelete(row) {
+      this.deletePicture = row
+      console.log(`onDetail deletePicture = ${JSON.stringify(this.deletePicture)}`)
+      this.delDialogVisible = true
+      this.currentDeleteType = 3
+      this.deletePictureTips = '确定删除该图片吗?'
+    },
+    // 删除对话框确定按钮
+    doDelete() {
+      this.delDialogVisible = false
+      const currentDeleteType = this.currentDeleteType
+      const deletePicture = this.deletePicture
+      if (currentDeleteType == 1) {
+
+      } else if (currentDeleteType == 2) {
+
+      } else if (currentDeleteType == 3) {
+        // 删除商品详情图片
+        this.detailPictureLoading = true
+        del({
+          deletePic: deletePicture,
+          deleteType: currentDeleteType
+        }).then((res) => {
+          this.detailPictureLoading = false
+          this.getDetailPictureList()
+          this.$message({
+          message: '删除成功',
+          type: 'success'
+          })
+        })
+      }
+    },
+    // 删除对话框取消按钮
+    doCancel() {
+      this.delDialogVisible = false
+      this.currentDeleteType = 0
     },
   }
 };

@@ -32,3 +32,12 @@ export function del(params) {
         method: 'get',
     })
 }
+
+// 修改新增商品的名称和价格
+export function fetchNewGoods(params) {
+    return request({
+        params,
+        url: `${baseURL}/swiper/addNewGoods`,
+        method: 'post',
+    })
+}

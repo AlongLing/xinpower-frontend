@@ -17,3 +17,48 @@ export function fetchGoodsTypeList(params) {
       method: 'get'
   })
 }
+
+// 根据商品_id获取商品首图
+export function fetchFirstPictureList(params) {
+  return request({
+    params,
+    url: `${baseURL}/goods/firstPictureList`,
+    method: 'get'
+  })
+}
+
+// 根据商品_id获取商品大图
+export function fetchBigPictureList(params) {
+  return request({
+    params,
+    url: `${baseURL}/goods/bigPictureList`,
+    method: 'get'
+  })
+}
+
+// 根据商品_id获取商品详情图片
+export function fetchDetailPictureList(params) {
+  return request({
+      params,
+      url: `${baseURL}/goods/detailPictureList`,
+      method: 'get'
+  })
+}
+
+// 删除商品图片
+export function del(params) {
+  return request({
+      params,
+      url: `${baseURL}/goods/del`,
+      method: 'get',
+  })
+}
+
+// 修改新增商品的名称，价格，类型
+export function fetchNewGoods(params) {
+  return request({
+    params,
+    url: `${baseURL}/goods/addNewGoods`,
+    method: 'post',
+})
+}

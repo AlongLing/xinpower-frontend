@@ -63,6 +63,11 @@ export const constantRoutes = [
         path: 'giftlist',
         component: () => import('@/views/giftlist/giftlist'),
         meta: { title: '商品管理', icon: 'example' }
+      }, {
+        path: 'addGoods',
+        component: () => import('@/views/giftlist/addGoods'),
+        meta: { title: '新增商品', icon: 'tree' },
+        hidden: true
       }
     ]
   },

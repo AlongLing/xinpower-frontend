@@ -60,5 +60,14 @@ export function fetchNewGoods(params) {
     params,
     url: `${baseURL}/goods/addNewGoods`,
     method: 'post',
-})
+  })
+}
+
+// 获取所有商品列表数据
+export function fetchGoodsList(params) {
+  return request({
+    params,
+    url: `${baseURL}/goods/getGoodsList`,
+    method: 'get',
+  })
 }

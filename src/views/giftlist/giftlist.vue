@@ -43,28 +43,68 @@
 </template>
 
 <script>
-
+import { fetchGoodsList, del } from '@/api/goods'
+import scroll from '@/utils/scroll'
 export default {
   data() {
     return {
       goodsList: [],
-
+      loading: false,
+      count: 50,
+      delDialogVisible: false,
+      deleteGoods: {},                             // 待删除的商品
     }
   },
   created() {
     this.getGoodsList()
   },
+
+   mounted() {
+    scroll.start(this.getGoodsList)
+  },
+
   methods: {
     // 获取商品列表数据
     getGoodsList() {
+      this.loading = true
+      fetchGoodsList({
+        start: this.goodsList.length,
+        count: this.count
+      }).then((res) => {
+        console.log(res)           // 获取到所有的商品数据
+        this.goodsList = this.goodsList.concat(res.data)
+        if (res.data.length < this.count) {                      // 当上拉回调的数据量小于 count 值时，说明数据全部请求完了，就不需要再请求了
+          scroll.end()
+        }
+        this.loading = false
+      })
     },
     // 删除按钮
     onGoodsDelete(row) {
-
+      this.deleteGoods = row
+      this.delDialogVisible = true
     },
     // 新增商品
     addGoods() {
       this.$router.push('/gift/addGoods')                               // 跳转到新增商品界面，需要在 router/index.js 中注册
+    },
+    // 删除对话框确定按钮
+    doGoodsDelete() {
+      this.delDialogVisible = false
+      this.loading = true
+      del({
+        deletePic: this.deleteGoods,
+        deleteType: 1,
+        deleteGoodsId: this.deleteGoods._id,
+      }).then((res) => {
+        this.loading = false
+        this.goodsList = []
+        this.getGoodsList()
+        this.$message({
+        message: '删除成功',
+        type: 'success'
+        })
+      })
     },
   }
 }

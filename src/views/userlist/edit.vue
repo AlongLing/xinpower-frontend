@@ -38,20 +38,20 @@
 <script>
 import { fetchUserById, updateScore, deleteUser } from '@/api/userlist'
 export default {
-    data() {
+  data() {
     return {
       user: {},
       addScore: 0,
       delDialogVisible: false,                                              // 决定是否显示删除对话框
-    };
+    }
   },
   created() {
     fetchUserById({
       id: this.$route.params.id,
     }).then((res) => {
-      console.log(res);
-      this.user = res.data;
-    });
+      console.log(res)
+      this.user = res.data
+    })
   },
   methods: {
     onSubmit() {

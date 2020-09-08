@@ -80,6 +80,11 @@ export const constantRoutes = [
         path: 'orderlist',
         component: () => import('@/views/orderlist/orderlist'),
         meta: { title: '订单管理', icon: 'tree' }
+      }, {
+        path: 'edit/:id',
+        component: () => import('@/views/orderlist/edit'),
+        meta: { title: '编辑', icon: 'table' },
+        hidden: true
       }
     ]
   },

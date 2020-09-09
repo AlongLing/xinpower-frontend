@@ -36,3 +36,12 @@ export function updateOrderIdAndState(params) {
         method: 'post'
     })
 }
+
+// 根据订单 id 删除订单信息
+export function deleteOrderById(params) {
+    return request({
+        params,
+        url: `${baseURL}/order/deleteOrderById`,
+        method: 'get'
+    })
+}

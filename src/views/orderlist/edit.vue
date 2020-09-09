@@ -31,17 +31,27 @@
         </p>
       </el-form-item>
     </el-form>
+
+    <!-- 确认删除的对话框 -->
+    <el-dialog title="提示" :visible.sync="delDialogVisible" width="30%">
+      <span>确定删除这条订单信息吗？删除后不可恢复，请慎重!</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="delDialogVisible = false">取 消</el-button>
+        <el-button type="danger" @click="doDelete">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchOrderById, updateOrderIdAndState } from "@/api/order";
+import { fetchOrderById, updateOrderIdAndState, deleteOrderById } from "@/api/order";
 export default {
   data() {
     return {
       order: {},
       orderIdDisabled: false,
       confirmText: "发货",
+      delDialogVisible: false,
     };
   },
 
@@ -50,56 +60,76 @@ export default {
     fetchOrderById({
       orderId: this.$route.params.id,
     }).then((res) => {
-      console.log(res);
-      this.order = res.data;
-    });
+      console.log(res)
+      this.order = res.data
+      if (this.order.orderState != '未发货') {
+        this.orderIdDisabled = true
+        this.confirmText = '确定'
+      }
+    })
   },
 
   methods: {
     onConfirm() {
       // 点击发货或者确定按钮
       console.log(`onConfirm: order = ${JSON.stringify(this.order)}`)
-      const orderState = this.order.orderState;
-      const id = this.order._id;
+      const orderState = this.order.orderState
+      const id = this.order._id
       if (orderState == "未发货") {
         const orderId = this.order.orderId;
         console.log(`onConfirm orderId = ${orderId}`);
         if (orderId == "") {
           alert("快递单号不能为空");
         } else {
-          // 修改订单的快递单号和订单状态
+          // 修改订单的快递单号和订单状态,发货时间
           updateOrderIdAndState({
             id: id, // 订单id
             orderId: orderId, // 订单的快递单号
             orderState: '已发货',
+            sendOutTime: Date.parse(new Date()),
           })
             .then((res) => {
               this.$message({
                 message: "发货成功",
                 type: "success",
-              });
-              this.$router.push("/order/orderlist");
+              })
+              this.$router.push("/order/orderlist")
             })
             .catch((err) => {
               this.$message({
                 message: "发货失败",
                 type: "error",
-              });
-              this.$router.push("/order/orderlist");
+              })
+              this.$router.push("/order/orderlist")
             });
         }
       } else {
-        this.$router.push("/order/orderlist");
+        this.$router.push("/order/orderlist")
       }
     },
 
     onCancel() {
       // 点击取消按钮
-      this.$router.push("/order/orderlist");
+      this.$router.push("/order/orderlist")
     },
 
     onDelete() {
-      // 删除订单
+      this.delDialogVisible = true
+    },
+
+    // 对话框删除确定按钮
+    doDelete() {
+      this.delDialogVisible = false
+      const id = this.order._id
+      deleteOrderById({
+        id: id
+      }).then((res) => {
+        this.$message({
+          message: "删除成功",
+          type: "success",
+        })
+        this.$router.push("/order/orderlist")
+      })
     },
   },
 };

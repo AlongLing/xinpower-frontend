@@ -9,19 +9,46 @@
     </el-row>
     <el-table v-loading="loading" :data="orderList" stripe style="width: 100%">
       <el-table-column type="index" width="50"></el-table-column>
-      <el-table-column label="图片" width="200">
+      <el-table-column label="商品" width="200" type="expand">
         <template slot-scope="scope">
-          <img :src="scope.row.download_url" alt height="50" />
+          <el-table v-loading="loading" :data="scope.row.goodsList" stripe style="width: 90%">
+            <el-table-column type="index" width="50"></el-table-column>
+            <el-table-column label="图片" width="200">
+            <template slot-scope="scope">
+              <img :src="scope.row.download_url" alt height="50" />
+            </template>
+            </el-table-column>
+            <el-table-column label="商品名称" width="400">
+              <template slot-scope="scope">
+                <p v-text="scope.row.goodsName"></p>
+              </template>
+            </el-table-column>
+            <el-table-column label="购买数量" width="210">
+              <template slot-scope="scope">
+                <p v-text="scope.row.goodsNumber"></p>
+              </template>
+            </el-table-column>
+            <el-table-column label="商品价格" width="210">
+              <template slot-scope="scope">
+                <p v-text="scope.row.goodsPrice"></p>
+              </template>
+            </el-table-column>
+          </el-table>
         </template>
       </el-table-column>
-      <el-table-column label="商品名称" width="400">
+      <el-table-column label="用户手机号码">
         <template slot-scope="scope">
-          <p v-text="scope.row.goodsName"></p>
+          <p v-text="scope.row.userPhone"></p>
         </template>
       </el-table-column>
-      <el-table-column label="购买数量">
+      <el-table-column label="收货人">
         <template slot-scope="scope">
-          <p v-text="scope.row.goodsNumber"></p>
+          <p v-text="scope.row.receiveName"></p>
+        </template>
+      </el-table-column>
+      <el-table-column label="收货人电话号码">
+        <template slot-scope="scope">
+          <p v-text="scope.row.receivePhone"></p>
         </template>
       </el-table-column>
       <el-table-column label="订单状态">
@@ -71,7 +98,7 @@ export default {
         count: this.count,
         orderState: this.orderState
       }).then((res) => {
-        console.log(`orderlist getOrderList res.data = ${res.data}`)           // 获取到所有的订单数据
+        console.log(`orderlist getOrderList res.data = ${JSON.stringify(res.data)}`)           // 获取到所有的订单数据
         this.orderList = this.orderList.concat(res.data)
         if (res.data.length < this.count) {                      // 当上拉回调的数据量小于 count 值时，说明数据全部请求完了，就不需要再请求了
           scroll.end()

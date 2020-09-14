@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 const baseURL = 'http://localhost:3000'
 
-// 获取商品分类的列表数据
+// 获取订单的列表数据
 export function fetchOrderList(params) {
     return request({
         params,

@@ -7,12 +7,6 @@
       <el-form-item label="订单状态">
         <el-input v-model="order.orderState" :disabled="true"></el-input>
       </el-form-item>
-      <el-form-item label="商品名称">
-        <el-input v-model="order.goodsName" :disabled="true"></el-input>
-      </el-form-item>
-      <el-form-item label="购买数量">
-        <el-input v-model="order.goodsNumber" :disabled="true"></el-input>
-      </el-form-item>
       <el-form-item label="收货人">
         <el-input v-model="order.receiveName" :disabled="true"></el-input>
       </el-form-item>

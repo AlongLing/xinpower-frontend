@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import { fetchOrderList, fetchOrderListByUserPhone } from '@/api/order'                          // 导入对应的 api 的函数
+import { fetchOrderList, fetchOrderListByUserPhone, fetchUpdateOrderStateByOrderId } from '@/api/order'                          // 导入对应的 api 的函数
 import scroll from '@/utils/scroll'
 export default {
   data() {
@@ -78,6 +78,8 @@ export default {
       operationText: '编辑',
       orderState: '未发货',                    // 订单状态：未发货 已发货 已收货
       count: 50,
+      orderStateIndex: 0,                      // 标志当前订单状态类型：0：默认值；1：未发货；2：已发货；3：已收货
+      hasCalledAutoConfirmOrderMethod: false   // true 表示已经调用了 autoConfirmOrder 方法
     }
   },
 
@@ -104,24 +106,32 @@ export default {
           scroll.end()
         }
         this.loading = false
+        if (this.orderStateIndex == 2 && !this.hasCalledAutoConfirmOrderMethod) {
+          this.hasCalledAutoConfirmOrderMethod = true
+          // 已发货状态，如果发货时间超过十天，则自动收货
+          this.autoConfirmOrder()
+        }
       })
     },
     // 未发货按钮
     unshippedOrder() {
       this.orderList = []
       this.orderState = '未发货'
+      this.orderStateIndex = 1
       this.getOrderList()
     },
     // 已发货按钮
     shippedOrder() {
       this.orderList = []
       this.orderState = '已发货'
+      this.orderStateIndex = 2
       this.getOrderList()
     },
     // 已收货按钮
     receivedOrder() {
       this.orderList = []
       this.orderState = '已收货'
+      this.orderStateIndex = 3
       this.getOrderList()
     },
     // 查找订单
@@ -150,6 +160,27 @@ export default {
     //编辑按钮，如果订单是未发货状态，则需要发货，其他状态，只是查看页面数据而已
     onOrderItemOperation(row) {
       this.$router.push(`/order/edit/${row._id}`)              // 跳转到对应路由的页面
+    },
+    // 发货后，超过十天，自动收货
+    async autoConfirmOrder() {
+      console.log(`orderlist autoConfirmOrder`)
+      const orderList = this.orderList
+      for (let i = 0; i < orderList.length; i++) {
+        const order = orderList[i]
+        if (order.orderState == '已发货') {
+          const timeMillis = new Date().getTime() - parseFloat(order.sendOutTime)
+          if (timeMillis > 864000000) {
+            await fetchUpdateOrderStateByOrderId({
+              id: order._id,
+              orderState: '已收货'
+            }).then((res) => {
+
+            })
+          }
+        }
+      }
+      this.orderList = []
+      this.getOrderList()
     },
     
   }

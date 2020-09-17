@@ -45,3 +45,12 @@ export function deleteOrderById(params) {
         method: 'get'
     })
 }
+
+// 根据订单 _id 修改订单状态
+export function fetchUpdateOrderStateByOrderId(params) {
+    return request({
+        params,
+        url: `${baseURL}/order/updateOrderStateByOrderId`,
+        method: 'post'
+    })
+}

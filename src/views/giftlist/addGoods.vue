@@ -7,6 +7,24 @@
       <el-form-item label="商品价格">
         <el-input v-model="newGoods.price" placeholder="请输入商品价格 格式：9999" type="number"></el-input>
       </el-form-item>
+      <el-form-item>
+        说明：请输入商品类型前的序号：1 数码电子；2 养生达人；3 差旅休闲；4 定制服务; 5 华鑫定制
+      </el-form-item>
+      <el-form-item label="商品类型">
+        <el-input v-model="newGoods.type" placeholder="请输入商品类型序号" type="number"></el-input>
+      </el-form-item>
+      <el-form-item label="品牌">
+        <el-input v-model="newGoods.brand" placeholder="请输入商品品牌"></el-input>
+      </el-form-item>
+      <el-form-item label="型号">
+        <el-input v-model="newGoods.model" placeholder="请输入商品型号"></el-input>
+      </el-form-item>
+      <el-form-item label="规格">
+        <el-input v-model="newGoods.specification" placeholder="请输入商品规格"></el-input>
+      </el-form-item>
+      <el-form-item label="描述">
+        <el-input v-model="newGoods.description" placeholder="请输入商品描述"></el-input>
+      </el-form-item>
       <el-form-item label="商品首图">
         <div>
           <div class="filter-container">
@@ -62,33 +80,6 @@
           </el-table>
         </div>
       </el-form-item>
-      <el-form-item label="详情图片">
-        <div>
-          <div class="filter-container">
-            <el-upload
-            class="upload-demo"
-            action="http://localhost:3000/goods/uploadDetailPicture"
-            :on-success="uploadDetailPictureSuccess"
-            :show-file-list="false"
-          >
-            <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，推荐5张商品详情图片</div>
-          </el-upload>
-          </div>
-          <el-table v-loading="detailPictureLoading" :data="detailPictureList" stripe style="width: 100%">
-            <el-table-column label="图片" width="400">
-              <template slot-scope="scope">
-                <img :src="scope.row.download_url" alt height="50" />
-              </template>
-            </el-table-column>
-            <el-table-column label="操作">
-              <template slot-scope="scope">
-                <el-button size="mini" type="danger" @click="onDetailPictureDelete(scope.row)">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onGoodsSubmit">确定</el-button>
         <el-button @click="onGoodsCancel">取消</el-button>
@@ -114,6 +105,11 @@ export default {
       newGoods: {
         name: "",
         price: "",
+        type: "",                       // 分类类型
+        brand: "",                      // 品牌
+        model: "",                      // 型号
+        specification: "",              // 规格
+        description: ""                 // 描述 
       },
       firstPictureLoading: false,
       firstPicture: [],                           // 这里用数组其实只是匹配格式，实际只用到了第一个对象
@@ -122,8 +118,6 @@ export default {
       goodsId: '',                                // 新增商品的id
       bigPictureLoading: false,
       bigPictureList: [],
-      detailPictureLoading: false,
-      detailPictureList: [],
       delDialogVisible: false,
       deletePictureTips: '',
       deletePicture: {},                          // 待删除的图片对象
@@ -164,16 +158,6 @@ export default {
         this.bigPictureLoading = false
       })
     },
-    // 获取商品详情图片列表
-    getDetailPictureList() {
-      this.detailPictureLoading = true
-      fetchDetailPictureList({
-        goodsId: this.goodsId
-      }).then((res) => {
-        this.detailPictureList = res.data
-        this.detailPictureLoading = false
-      })
-    },
     // 上传商品首图成功后的回调
     uploadFirstPictureSuccess(res) {
       if (res.id_list.length > 0) {
@@ -191,11 +175,6 @@ export default {
       console.log(`uploadBigPictureSuccess = ${res.id_list}`)              // 这个数据返回为空，这里是更新，不同于上面的新增，也可以用swiperPictureId 来获取上传之后的大图id
       this.getBigPictureList()
     },
-    // 上传商品详情图片成功后的回调
-    uploadDetailPictureSuccess(res) {
-      console.log(`uploadDetailPictureSuccess = ${res.id_list}`)
-      this.getDetailPictureList()
-    },
     // 删除商品首图
     onFirstPictureDelete(row) {
       this.deletePicture = row
@@ -210,14 +189,6 @@ export default {
       console.log(`onDetail deletePicture = ${JSON.stringify(this.deletePicture)}`)
       this.delDialogVisible = true
       this.currentDeleteType = 2
-      this.deletePictureTips = '确定删除该图片吗?'
-    },
-    // 删除商品详情图片
-    onDetailPictureDelete(row) {
-      this.deletePicture = row
-      console.log(`onDetail deletePicture = ${JSON.stringify(this.deletePicture)}`)
-      this.delDialogVisible = true
-      this.currentDeleteType = 3
       this.deletePictureTips = '确定删除该图片吗?'
     },
     // 对话框确定按钮
@@ -237,7 +208,6 @@ export default {
           this.firstPictureLoading = false
           this.getFirstPictureList()
           this.getBigPictureList()
-          this.getDetailPictureList()
           this.firstPicture = []
           this.alertMessage(1, '删除成功')
           // 将上传按钮设置为不可用
@@ -257,17 +227,6 @@ export default {
           this.getBigPictureList()
           this.alertMessage(1, '删除成功')
         })
-      } else if (currentDeleteType == 3) {
-        // 删除商品详情图片
-        this.detailPictureLoading = true
-        del({
-          deletePic: deletePicture,
-          deleteType: currentDeleteType
-        }).then((res) => {
-          this.detailPictureLoading = false
-          this.getDetailPictureList()
-          this.alertMessage(1, '删除成功')
-        })
       } else {
         // do nothing
       }
@@ -282,12 +241,60 @@ export default {
     onGoodsSubmit() {
       const goodsName = this.newGoods.name
       const goodsPrice = this.newGoods.price
+      const type = this.newGoods.type
+      const brand = this.newGoods.brand
+      const model = this.newGoods.model
+      const specification = this.newGoods.specification
+      const description = this.newGoods.description
+      let goodsTypeId = ''
       if (goodsName == '') {
         this.alertMessage(2, '商品名称不能为空')
         return
       }
       if (goodsPrice == '') {
         this.alertMessage(2, '商品价格不能为空')
+        return
+      }
+      if (type == "") {
+        this.alertMessage(2, '商品类型不能为空')
+        return
+      } else {
+        const typeIndex = parseInt(type)
+        switch (typeIndex) {
+          case 1:
+            goodsTypeId = JSON.parse(this.goodsTypeList[1])._id
+            break
+          case 2:
+            goodsTypeId = JSON.parse(this.goodsTypeList[2])._id
+            break
+          case 3:
+            goodsTypeId = JSON.parse(this.goodsTypeList[3])._id
+            break
+          case 4:
+            goodsTypeId = JSON.parse(this.goodsTypeList[4])._id
+            break
+          case 5:
+            goodsTypeId = JSON.parse(this.goodsTypeList[5])._id
+            break
+          default:
+            this.alertMessage(4, '商品类型不合法')
+            return   
+        }
+      }
+      if (brand == "") {
+        this.alertMessage(2, '商品品牌不能为空')
+        return
+      }
+      if (model == "") {
+        this.alertMessage(2, '商品型号不能为空')
+        return
+      }
+      if (specification == "") {
+        this.alertMessage(2, '商品规格不能为空')
+        return
+      }
+      if (description == "") {
+        this.alertMessage(2, '商品描述不能为空')
         return
       }
       if (this.firstPicture.length == 0) {
@@ -298,28 +305,15 @@ export default {
         this.alertMessage(2, '商品大图不能为空')
         return
       }
-      if (this.detailPictureList.length == 0) {
-        this.alertMessage(2, '商品详情图片不能为空')
-        return
-      }
-      let goodsTypeId = ''
-      const priceNumber = parseInt(goodsPrice)
-      console.log(`priceNumber = ${priceNumber}`)
-      if (priceNumber <= 500) {                           // 当前商品的价格小于 500 鑫星
-        goodsTypeId = JSON.parse(this.goodsTypeList[0])._id
-      } else if (priceNumber <= 2000) {
-        goodsTypeId = JSON.parse(this.goodsTypeList[1])._id
-      } else if (priceNumber <= 5000) {
-        goodsTypeId = JSON.parse(this.goodsTypeList[2])._id
-      } else {
-        goodsTypeId = JSON.parse(this.goodsTypeList[3])._id
-      }
-
       fetchNewGoods({
         goodsId: this.goodsId,
         name: goodsName,
         price: goodsPrice,
-        typeId: goodsTypeId
+        typeId: goodsTypeId,
+        brand: brand,
+        model: model,
+        specification: specification,
+        description: description
       }).then((res) => {
         console.log(`res.data.length = ${res.data.length}`)
         this.alertMessage(1, '新增商品成功')

@@ -1,8 +1,9 @@
 import request from '@/utils/request'
 const baseURL = 'http://localhost:3000'
 
-export function fetchSwiperHomeList(){
+export function fetchSwiperHomeList(params){
     return request({
+        params,
         url: `${baseURL}/swiper/homelist`,
         method: 'get'
     })
@@ -38,6 +39,15 @@ export function fetchNewGoods(params) {
     return request({
         params,
         url: `${baseURL}/swiper/addNewGoods`,
+        method: 'post',
+    })
+}
+
+// 修改轮播商品的状态
+export function updateSwiperGoodsState(params) {
+    return request({
+        params,
+        url: `${baseURL}/swiper/updateSwiperGoodsState`,
         method: 'post',
     })
 }

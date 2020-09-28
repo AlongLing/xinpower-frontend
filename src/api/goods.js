@@ -54,6 +54,15 @@ export function del(params) {
   })
 }
 
+// 修改商品状态(上架/下架)
+export function updateGoodsState(params) {
+  return request({
+    params,
+    url: `${baseURL}/goods/updateGoodsState`,
+    method: 'post',
+  })
+}
+
 // 修改新增商品的名称，价格，类型
 export function fetchNewGoods(params) {
   return request({

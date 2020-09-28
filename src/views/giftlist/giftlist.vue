@@ -1,5 +1,7 @@
 <template>
   <div>
+    <el-button type="primary" class="add-goods-btn" @click="getGoodsUp">已上架商品</el-button>
+    <el-button type="primary" class="add-goods-btn" @click="getGoodsDown">已下架商品</el-button>
     <el-button type="primary" class="add-goods-btn" @click="addGoods">新增商品</el-button>
     <el-table v-loading="loading" :data="goodsList" stripe style="width: 100%">
       <el-table-column type="index" width="50"></el-table-column>
@@ -26,24 +28,25 @@
 
       <el-table-column label="操作">
         <template slot-scope="scope">
+          <el-button size="mini" type="primary" @click="updateGoodsState(scope.row)">{{dowmUpBtnText}}</el-button>
           <el-button size="mini" type="danger" @click="onGoodsDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <!-- 确认删除的对话框 -->
-    <el-dialog title="提示" :visible.sync="delDialogVisible" width="30%">
-      <span>确定删除该商品吗</span>
+    <!-- 确认删除或下架的对话框 -->
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="30%">
+      <span>{{dialogTitle}}</span>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="delDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="doGoodsDelete">确 定</el-button>
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogConfirm">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchGoodsList, del } from '@/api/goods'
+import { fetchGoodsList, del, updateGoodsState } from '@/api/goods'
 import scroll from '@/utils/scroll'
 export default {
   data() {
@@ -51,8 +54,12 @@ export default {
       goodsList: [],
       loading: false,
       count: 50,
-      delDialogVisible: false,
-      deleteGoods: {},                             // 待删除的商品
+      dialogVisible: false,
+      goods: {},                             // 待下架或删除的商品
+      dialogTitle: '确定删除该商品吗？',
+      dialogTip: 0,                                        // 对话框类型，1：商品下架对话框 2：商品删除对话框
+      goodsState: '已上架',
+      dowmUpBtnText: '下架'                                // 上架或下架按钮文字
     }
   },
   created() {
@@ -69,7 +76,8 @@ export default {
       this.loading = true
       fetchGoodsList({
         start: this.goodsList.length,
-        count: this.count
+        count: this.count,
+        goodsState: this.goodsState
       }).then((res) => {
         console.log(res)           // 获取到所有的商品数据
         this.goodsList = this.goodsList.concat(res.data)
@@ -79,32 +87,92 @@ export default {
         this.loading = false
       })
     },
+    // 下架或上架轮播商品
+    updateGoodsState(row) {
+      if (this.dowmUpBtnText == '下架') {
+        this.dialogTitle = '确定下架该商品吗？'
+      } else if (this.dowmUpBtnText == '上架') {
+        this.dialogTitle = '确定上架该商品吗？'
+      } else {
+        // do nothing
+      }
+      this.dialogTip = 1
+      this.goods = row
+      this.dialogVisible = true
+    },
     // 删除按钮
     onGoodsDelete(row) {
-      this.deleteGoods = row
-      this.delDialogVisible = true
+      this.dialogTitle = '确定删除该商品吗？'
+      this.dialogTip = 2
+      this.goods = row
+      this.dialogVisible = true
+    },
+    // 获取已上架商品
+    getGoodsUp() {
+      this.goodsState = '已上架'
+      this.dowmUpBtnText = '下架'
+      this.goodsList = []
+      this.getGoodsList()
+    },
+    // 获取已下架商品
+    getGoodsDown() {
+      this.goodsState = '已下架'
+      this.dowmUpBtnText = '上架'
+      this.goodsList = []
+      this.getGoodsList()
     },
     // 新增商品
     addGoods() {
       this.$router.push('/gift/addGoods')                               // 跳转到新增商品界面，需要在 router/index.js 中注册
     },
-    // 删除对话框确定按钮
-    doGoodsDelete() {
-      this.delDialogVisible = false
+    // 商品删除或下架对话框确定按钮
+    dialogConfirm() {
+      this.dialogVisible = false
       this.loading = true
-      del({
-        deletePic: this.deleteGoods,
-        deleteType: 1,
-        deleteGoodsId: this.deleteGoods._id,
-      }).then((res) => {
-        this.loading = false
-        this.goodsList = []
-        this.getGoodsList()
-        this.$message({
-        message: '删除成功',
-        type: 'success'
+      const goods = this.goods
+      if (this.dialogTip == 1) {
+        if (this.dowmUpBtnText == '下架') {
+          updateGoodsState({
+            goodsId: goods._id,
+            goodsState: '已下架'
+          }).then((res) => {
+            this.loading = false
+            this.goodsList = []
+            this.getGoodsList()
+            this.$message({
+            message: '下架成功',
+            type: 'success'
+            })
+          })
+        } else if (this.dowmUpBtnText == '上架') {
+          updateGoodsState({
+            goodsId: goods._id,
+            goodsState: '已上架'
+          }).then((res) => {
+            this.loading = false
+            this.goodsList = []
+            this.getGoodsList()
+            this.$message({
+            message: '上架成功',
+            type: 'success'
+            })
+          })
+        }
+      } else if (this.dialogTip == 2) {
+        del({
+          deletePic: goods,
+          deleteType: 1,
+          deleteGoodsId: goods._id,
+        }).then((res) => {
+          this.loading = false
+          this.goodsList = []
+          this.getGoodsList()
+          this.$message({
+          message: '删除成功',
+          type: 'success'
+          })
         })
-      })
+      }
     },
   }
 }

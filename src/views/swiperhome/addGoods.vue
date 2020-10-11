@@ -139,7 +139,9 @@ export default {
   methods: {
     getSwiperHomeList() {
       this.firstPictureLoading = true
-      fetchSwiperHomeList().then((res) => {
+      fetchSwiperHomeList({
+        goodsState: '已上架'
+      }).then((res) => {
         console.log(res)
         const swiperHomeList = res.data                  // swiperHomeList 是一个数组
         this.firstPictureLoading = false

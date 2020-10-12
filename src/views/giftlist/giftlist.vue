@@ -66,7 +66,7 @@ export default {
     this.getGoodsList()
   },
 
-   mounted() {
+  mounted() {
     scroll.start(this.getGoodsList)
   },
 

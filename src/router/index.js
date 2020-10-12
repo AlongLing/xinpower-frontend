@@ -107,6 +107,28 @@ export const constantRoutes = [
   },
 
   {
+    path: '/vphoto',
+    component: Layout,
+    children: [
+      {
+        path: 'vphotoMenu',
+        component: () => import('@/views/vphoto/menu'),
+        meta: { title: 'vphoto管理', icon: 'example' }
+      }, {
+        path: 'addActivity',
+        component: () => import('@/views/vphoto/addActivity'),
+        meta: { title: '新增活动', icon: 'tree' },
+        hidden: true
+      }, {
+        path: 'pictureList/:id',
+        component: () => import('@/views/vphoto/pictureList'),
+        meta: { title: '新增活动图片', icon: 'tree' },
+        hidden: true
+      }
+    ]
+  },
+
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true

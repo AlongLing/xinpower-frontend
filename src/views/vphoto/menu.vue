@@ -93,8 +93,8 @@ export default {
 </script>
 
 <style>
-    .add-activity-btn {
+  .add-activity-btn {
     margin-top: 10px;
     margin-left: 20px;
-    }
+  }
 </style>

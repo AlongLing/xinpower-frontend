@@ -36,3 +36,20 @@ export function updateVphotoId(params) {
     method: 'get',
   })
 }
+
+export function updatePictureInfo(params) {
+  return request({
+    params,
+    url: `${baseURL}/vphoto/updatePictureInfo`,
+    method: 'post',
+  })
+}
+
+// 删除图片
+export function del(params) {
+  return request({
+    params,
+    url: `${baseURL}/vphoto/del`,
+    method: 'get',
+  })
+}

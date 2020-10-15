@@ -1,11 +1,11 @@
 import request from '@/utils/request'
 const baseURL = 'http://localhost:3000'
 
-// 新增一条新的vphoto活动数据
-export function fetchAddVphoto(params) {
+// 根据_id更新vphoto活动数据
+export function updateVphotoById(params) {
   return request({
     params,
-    url: `${baseURL}/vphoto/addVphoto`,
+    url: `${baseURL}/vphoto/updateVphotoById`,
     method: 'post'
   })
 }
@@ -50,6 +50,24 @@ export function del(params) {
   return request({
     params,
     url: `${baseURL}/vphoto/del`,
+    method: 'get',
+  })
+}
+
+// 根据 _id 查找 vphoto 实例
+export function fetchVphotoById(params) {
+  return request({
+    params,
+    url: `${baseURL}/vphoto/getVphotoById`,
+    method: 'get',
+  })
+}
+
+// 删除vphoto实例以及对应的海报
+export function deleteVphotoById(params) {
+  return request({
+    params,
+    url: `${baseURL}/vphoto/deleteVphotoById`,
     method: 'get',
   })
 }

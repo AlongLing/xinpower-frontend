@@ -3,8 +3,21 @@
     <el-button type="primary" class="add-activity-btn" @click="addActivity">新建活动</el-button>
     <el-table v-loading="loading" :data="vphotoList" stripe style="width: 100%">
       <el-table-column type="index" width="50"></el-table-column>
-      <el-table-column prop="name" label="活动主题" width="600"></el-table-column>
-      <el-table-column prop="date" label="活动时间"></el-table-column>
+      <el-table-column label="图片" width="400">
+        <template slot-scope="scope">
+          <img :src="scope.row.download_url" alt height="100" />
+        </template>
+      </el-table-column>
+      <el-table-column label="活动主题" width="300">
+        <template slot-scope="scope">
+          <p v-text="scope.row.name"></p>
+        </template>
+      </el-table-column>
+      <el-table-column label="活动时间" width="300">
+        <template slot-scope="scope">
+          <p v-text="scope.row.date"></p>
+        </template>
+      </el-table-column>
 
       <el-table-column label="操作">
         <template slot-scope="scope">
@@ -20,11 +33,20 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- 确认删除的对话框 -->
+    <el-dialog title="提示" :visible.sync="delDialogVisible" width="30%">
+      <span>确定删除该场活动吗？</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="doCancel">取 消</el-button>
+        <el-button type="primary" @click="doDelete">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchVphotoList } from '@/api/vphoto'
+import { fetchVphotoList, deleteVphotoById } from '@/api/vphoto'
 import scroll from '@/utils/scroll'
 export default {
   data() {
@@ -32,6 +54,8 @@ export default {
       vphotoList: [],                         // vphoto列表
       loading: false,
       count: 50,
+      delDialogVisible: false,
+      deleteVphoto: {}                        // 待删除的活动
     }
   },
 
@@ -88,6 +112,27 @@ export default {
       console.log(`updateVphotoList row = ${row}`)
       this.$router.push(`/vphoto/pictureList/${row._id}`)              // 跳转到对应路由的页面
     },
+
+    onVphotoDelete(row) {
+      this.deleteVphoto = row
+      this.delDialogVisible = true
+    },
+
+    // 删除对话框确定按钮
+    doDelete() {
+      deleteVphotoById({
+        vphotoId: this.deleteVphoto._id,
+        deleteVphoto: this.deleteVphoto
+      }).then((res) => {
+        this.delDialogVisible = false
+        this.vphotoList = []
+        this.getVphotoList()
+      })
+    },
+    // 删除对话框取消按钮
+    doCancel() {
+      this.delDialogVisible = false
+    }
   }
 }
 </script>

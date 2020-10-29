@@ -11,6 +11,7 @@
       <el-table-column prop="userName" label="用户名"></el-table-column>
       <el-table-column prop="telephone" label="电话号码"></el-table-column>
       <el-table-column prop="score" label="可使用积分"></el-table-column>
+      <el-table-column prop="growthValue" label="当前成长值"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="mini" @click="onEdit(scope.row)">编辑</el-button>

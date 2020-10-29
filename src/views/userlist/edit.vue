@@ -1,6 +1,6 @@
 <template>
     <div>
-    <el-form ref="form" :model="user" label-width="80px">
+    <el-form ref="form" :model="user" label-width="120px">
       <el-form-item label="用户名">
         <el-input v-model="user.userName" :disabled="true"></el-input>
       </el-form-item>
@@ -10,11 +10,17 @@
       <el-form-item label="是否注册">
         <el-input v-model="user.hasRegister" :disabled="true"></el-input>
       </el-form-item>
+      <el-form-item label="当前成长值">
+        <el-input v-model="user.growthValue" :disabled="true"></el-input>
+      </el-form-item>
+      <el-form-item label="新增成长值">
+        <el-input placeholder="0" v-model="addGrowthValue" clearable type="number"></el-input>
+      </el-form-item>
       <el-form-item label="可用积分">
         <el-input v-model="user.score" :disabled="true"></el-input>
       </el-form-item>
       <el-form-item label="新增积分">
-        <el-input placeholder="0" v-model="addScore" clearable></el-input>
+        <el-input placeholder="0" v-model="addScore" clearable type="number"></el-input>
       </el-form-item>
 
       <el-form-item>
@@ -36,11 +42,12 @@
 </template>
 
 <script>
-import { fetchUserById, updateScore, deleteUser } from '@/api/userlist'
+import { fetchUserById, updateScoreAndGrowthValue, deleteUser } from '@/api/userlist'
 export default {
   data() {
     return {
       user: {},
+      addGrowthValue: 0,
       addScore: 0,
       delDialogVisible: false,                                              // 决定是否显示删除对话框
     }
@@ -56,11 +63,12 @@ export default {
   methods: {
     onSubmit() {
       console.log(`score = ${this.user.score}, addScore = ${this.addScore}`)
-      const total = parseInt(this.user.score) + parseInt(this.addScore)
-      console.log(`total = ${total}`)
-      updateScore({
+      const totalScore = parseInt(this.user.score) + parseInt(this.addScore)
+      const totalGrowthValue = parseInt(this.user.growthValue) + parseInt(this.addGrowthValue)
+      updateScoreAndGrowthValue({
         id: this.$route.params.id,
-        score: total,
+        score: totalScore,
+        growthValue: totalGrowthValue
       }).then((res) => {
         if(res.data.modified > 0){
               this.$message({

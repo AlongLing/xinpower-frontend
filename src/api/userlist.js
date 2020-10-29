@@ -38,11 +38,11 @@ export function addUser(params) {
   })
 }
 
-// 更新用户的积分
-export function updateScore(params) {
+// 更新用户的积分和成长值
+export function updateScoreAndGrowthValue(params) {
   return request({
     params,
-    url: `${baseURL}/userlist/updateScore`,
+    url: `${baseURL}/userlist/updateScoreAndGrowthValue`,
     method: 'post'
   })
 }

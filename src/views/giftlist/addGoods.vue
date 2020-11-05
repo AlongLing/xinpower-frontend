@@ -53,6 +53,34 @@
           </el-table>
         </div>
       </el-form-item>
+      <el-form-item label="商品小图">
+        <div>
+          <div class="filter-container">
+            <el-upload
+            class="upload-demo"
+            action="http://localhost:3000/goods/uploadSmallPicture"
+            :on-success="uploadSmallPictureSuccess"
+            :disabled="smallPictureDisabled"
+            :show-file-list="false"
+          >
+            <el-button size="small" type="primary">{{smallPictureBtnText}}</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且只能上传一张</div>
+          </el-upload>
+          </div>
+           <el-table v-loading="smallPictureLoading" :data="smallPicture" stripe style="width: 100%">
+            <el-table-column label="图片" width="400">
+              <template slot-scope="scope">
+                <img :src="scope.row.download_url" alt height="50" />
+              </template>
+            </el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button size="mini" type="danger" @click="onsmallPictureDelete(scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </el-form-item>
       <el-form-item label="商品大图">
         <div>
           <div class="filter-container">
@@ -98,7 +126,7 @@
 </template>
 
 <script>
-import { fetchFirstPictureList, fetchBigPictureList, fetchDetailPictureList, del, fetchGoodsTypeList, fetchNewGoods } from '@/api/goods'
+import { fetchFirstPictureList, fetchBigPictureList, fetchDetailPictureList, del, fetchGoodsTypeList, fetchNewGoods, fetchSmallPictureList } from '@/api/goods'
 export default {
   data() {
     return {
@@ -121,7 +149,11 @@ export default {
       delDialogVisible: false,
       deletePictureTips: '',
       deletePicture: {},                          // 待删除的图片对象
-      goodsTypeList: [],                          // 商品分类列表数据           
+      goodsTypeList: [],                          // 商品分类列表数据
+      smallPictureDisabled: false,
+      smallPictureBtnText: '点击上传',
+      smallPictureLoading: false,
+      smallPicture: []                             // 这里用数组其实只是匹配格式，实际只用到了第一个对象          
     }
   },
 
@@ -148,6 +180,16 @@ export default {
         this.firstPictureLoading = false
       })
     },
+    // 获取商品小图列表，其实只有一张图片
+    getSmallPictureList() {
+      this.smallPictureLoading = true
+      fetchSmallPictureList({
+        goodsId: this.goodsId
+      }).then((res) => {
+        this.smallPicture = res.data
+        this.smallPictureLoading = false
+      })
+    },
     // 获取商品大图列表
     getBigPictureList() {
       this.bigPictureLoading = true
@@ -170,6 +212,14 @@ export default {
         this.FirstPictureBtnText = '已上传'
       }
     },
+    // 上传商品小图成功之后的回调
+    uploadSmallPictureSuccess(res) {
+      this.alertMessage(1, '上传成功')
+      this.getSmallPictureList()
+      // 将上传按钮设置为不可用
+      this.smallPictureDisabled = true
+      this.smallPictureBtnText = '已上传'
+    },
     // 上传商品大图成功后的回调
     uploadBigPictureSuccess(res) {
       console.log(`uploadBigPictureSuccess = ${res.id_list}`)              // 这个数据返回为空，这里是更新，不同于上面的新增，也可以用swiperPictureId 来获取上传之后的大图id
@@ -182,6 +232,14 @@ export default {
       this.delDialogVisible = true
       this.currentDeleteType = 1
       this.deletePictureTips = '警告!!! 删除商品首图将删除该商品的全部信息，请慎重选择'
+    },
+    // 删除商品小图
+    onsmallPictureDelete(row) {
+      this.deletePicture = row
+      console.log(`onsmallPictureDelete deletePicture = ${JSON.stringify(this.deletePicture)}`)
+      this.delDialogVisible = true
+      this.currentDeleteType = 3
+      this.deletePictureTips = '确定删除该图片吗?'
     },
     // 删除商品大图
     onBigPictureDelete(row) {
@@ -210,7 +268,7 @@ export default {
           this.getBigPictureList()
           this.firstPicture = []
           this.alertMessage(1, '删除成功')
-          // 将上传按钮设置为不可用
+          // 将上传按钮设置为可用
           this.FirstPictureDisabled = false
           this.FirstPictureBtnText = '点击上传'
           // 回到商品列表页面, 这里后续要修改，不需要回到上一页，只清除当前页的数据就好
@@ -226,6 +284,20 @@ export default {
           this.bigPictureLoading = false
           this.getBigPictureList()
           this.alertMessage(1, '删除成功')
+        })
+      } else if (currentDeleteType == 3) {
+        // 删除商品小图
+        this.smallPictureLoading = true
+        del({
+          deletePic: deletePicture,
+          deleteType: currentDeleteType
+        }).then((res) => {
+          this.smallPictureLoading = false
+          this.getSmallPictureList()
+          this.alertMessage(1, '删除成功')
+          // 将上传按钮设置为不可用
+          this.smallPictureDisabled = false
+          this.smallPictureBtnText = '点击上传'
         })
       } else {
         // do nothing

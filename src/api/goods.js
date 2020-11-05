@@ -27,6 +27,15 @@ export function fetchFirstPictureList(params) {
   })
 }
 
+// 根据商品_id获取商品小图
+export function fetchSmallPictureList(params) {
+  return request({
+    params,
+    url: `${baseURL}/goods/smallPictureList`,
+    method: 'get'
+  })
+}
+
 // 根据商品_id获取商品大图
 export function fetchBigPictureList(params) {
   return request({

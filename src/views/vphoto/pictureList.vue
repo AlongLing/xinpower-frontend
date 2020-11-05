@@ -3,10 +3,10 @@
     <div>
       <el-form ref="form" :model="picture" label-width="80px">
         <el-form-item label="图片宽度">
-          <el-input v-model="picture.pictureWidth" placeholder="请输入商品名称和描述"></el-input>
+          <el-input v-model="picture.pictureWidth" placeholder="横屏图片：宽：500；竖屏图片：宽300"></el-input>
         </el-form-item>
         <el-form-item label="图片高度">
-          <el-input v-model="picture.pictureHeight" placeholder="请输入商品价格 格式：9999" type="number"></el-input>
+          <el-input v-model="picture.pictureHeight" placeholder="横屏图片：高：300；竖屏图片：高：500" type="number"></el-input>
         </el-form-item>
         <el-form-item label="上传图片">
           <div class="filter-container">

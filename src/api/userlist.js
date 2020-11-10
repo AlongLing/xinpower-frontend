@@ -38,7 +38,7 @@ export function addUser(params) {
   })
 }
 
-// 更新用户的积分和成长值
+// 更新用户的积分和成长值(已废弃，待删除)
 export function updateScoreAndGrowthValue(params) {
   return request({
     params,
@@ -46,6 +46,18 @@ export function updateScoreAndGrowthValue(params) {
     method: 'post'
   })
 }
+
+// 更新用户积分和积分说明
+export function updateScoreById(params) {
+  return request({
+    params,
+    url: `${baseURL}/userlist/updateScoreById`,
+    method: 'post'
+  })
+}
+
+// 更新用户成长值和成长值说明
+// todo: 明天再来写
 
 // 根据user _id 删除用户
 export function deleteUser(params) {

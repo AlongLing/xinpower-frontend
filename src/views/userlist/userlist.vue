@@ -8,13 +8,14 @@
     </el-row>
     <el-table v-loading="loading" :data="userlist" stripe>
       <el-table-column type="index" width="50"></el-table-column>
-      <el-table-column prop="userName" label="用户名"></el-table-column>
-      <el-table-column prop="telephone" label="电话号码"></el-table-column>
-      <el-table-column prop="score" label="可使用积分"></el-table-column>
-      <el-table-column prop="growthValue" label="当前成长值"></el-table-column>
+      <el-table-column prop="userName" label="用户名" width="230"></el-table-column>
+      <el-table-column prop="telephone" label="电话号码" width="230"></el-table-column>
+      <el-table-column prop="score" label="可使用积分" width="230"></el-table-column>
+      <el-table-column prop="growthValue" label="当前成长值" width="230"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button size="mini" @click="onEdit(scope.row)">编辑</el-button>
+          <el-button size="mini" @click="onAddXinBean(scope.row)">新增鑫豆</el-button>
+          <el-button size="mini" @click="onAddGrowthValue(scope.row)">新增成长值</el-button>
           <el-button size="mini" type="primary" @click="onDel(scope.row)">查看详情</el-button>
         </template>
       </el-table-column>
@@ -106,8 +107,12 @@ export default {
       }
     },
 
-    onEdit(row) {
-      this.$router.push(`/user/edit/${row._id}`)              // 跳转到对应路由的页面
+    onAddXinBean(row) {
+      this.$router.push(`/user/addXinBean/${row._id}`)              // 跳转到新增鑫豆页面
+    },
+
+    onAddGrowthValue(row) {
+      this.$router.push(`/user/addGrowthValue/${row._id}`)              // 跳转到新增成长值页面
     },
 
     findUser() {

@@ -47,8 +47,13 @@ export const constantRoutes = [
         component: () => import('@/views/userlist/userlist'),
         meta: { title: '营员管理', icon: 'table' }
       }, {
-        path: 'edit/:id',
-        component: () => import('@/views/userlist/edit'),
+        path: 'addGrowthValue/:id',
+        component: () => import('@/views/userlist/addGrowthValue'),
+        meta: { title: '编辑', icon: 'table' },
+        hidden: true
+      }, {
+        path: 'addXinBean/:id',
+        component: () => import('@/views/userlist/addXinBean'),
         meta: { title: '编辑', icon: 'table' },
         hidden: true
       }

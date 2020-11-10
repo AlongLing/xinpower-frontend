@@ -16,11 +16,8 @@
       <el-form-item label="新增成长值">
         <el-input placeholder="0" v-model="addGrowthValue" clearable type="number"></el-input>
       </el-form-item>
-      <el-form-item label="可用积分">
-        <el-input v-model="user.score" :disabled="true"></el-input>
-      </el-form-item>
-      <el-form-item label="新增积分">
-        <el-input placeholder="0" v-model="addScore" clearable type="number"></el-input>
+      <el-form-item label="新增说明">
+        <el-input placeholder="简短描述新增成长值的理由" v-model="reason" clearable type="text"></el-input>
       </el-form-item>
 
       <el-form-item>
@@ -42,13 +39,13 @@
 </template>
 
 <script>
-import { fetchUserById, updateScoreAndGrowthValue, deleteUser } from '@/api/userlist'
+import { fetchUserById, updateGrowthValueById, deleteUser } from '@/api/userlist'
 export default {
   data() {
     return {
       user: {},
       addGrowthValue: 0,
-      addScore: 0,
+      reason: '',
       delDialogVisible: false,                                              // 决定是否显示删除对话框
     }
   },
@@ -56,30 +53,38 @@ export default {
     fetchUserById({
       id: this.$route.params.id,
     }).then((res) => {
-      console.log(res)
       this.user = res.data
     })
   },
   methods: {
     onSubmit() {
-      console.log(`score = ${this.user.score}, addScore = ${this.addScore}`)
-      const totalScore = parseInt(this.user.score) + parseInt(this.addScore)
-      const totalGrowthValue = parseInt(this.user.growthValue) + parseInt(this.addGrowthValue)
-      updateScoreAndGrowthValue({
-        id: this.$route.params.id,
-        score: totalScore,
-        growthValue: totalGrowthValue
-      }).then((res) => {
-        if(res.data.modified > 0){
-              this.$message({
+      const growthValue = parseInt(this.user.growthValue) + parseInt(this.addGrowthValue)
+      const reason = this.reason
+      if (reason === '' || reason === undefined) {
+        this.$message({
+            message: '请填写新增成长值的理由',
+            type: 'warning'
+        })
+      } else {
+        updateGrowthValueById({
+          id: this.user._id,
+          growthValue: growthValue,
+          addGrowthValue: this.addGrowthValue,
+          reason: reason
+        }).then((res) => {
+          if (res.code === 20000) {
+            this.$message({
                   message: '更新成功',
                   type: 'success'
               })
-          }else{
-              this.$message.error('更新失败')
+          } else {
+            this.$message.error('更新失败')
           }
+          this.addGrowthValue = 0
+          this.reason = ''
           this.$router.push('/user/userlist')
-      })
+        })
+      }
     },
     
     onCancel() {

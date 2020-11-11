@@ -57,7 +57,13 @@ export function updateScoreById(params) {
 }
 
 // 更新用户成长值和成长值说明
-// todo: 明天再来写
+export function updateGrowthValueById(params) {
+  return request({
+    params,
+    url: `${baseURL}/userlist/updateGrowthValueById`,
+    method: 'post'
+  })
+}
 
 // 根据user _id 删除用户
 export function deleteUser(params) {

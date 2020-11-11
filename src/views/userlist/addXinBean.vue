@@ -82,6 +82,7 @@ export default {
           }
           this.addScore = 0
           this.reason = ''
+          this.$router.push('/user/userlist')
         })
       }
     },

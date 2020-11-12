@@ -79,7 +79,6 @@ export default {
         count: this.count,
         goodsState: this.goodsState
       }).then((res) => {
-        console.log(res)           // 获取到所有的商品数据
         this.goodsList = this.goodsList.concat(res.data)
         if (res.data.length < this.count) {                      // 当上拉回调的数据量小于 count 值时，说明数据全部请求完了，就不需要再请求了
           scroll.end()
@@ -89,9 +88,9 @@ export default {
     },
     // 下架或上架轮播商品
     updateGoodsState(row) {
-      if (this.dowmUpBtnText == '下架') {
+      if (this.dowmUpBtnText === '下架') {
         this.dialogTitle = '确定下架该商品吗？'
-      } else if (this.dowmUpBtnText == '上架') {
+      } else if (this.dowmUpBtnText === '上架') {
         this.dialogTitle = '确定上架该商品吗？'
       } else {
         // do nothing
@@ -131,7 +130,7 @@ export default {
       this.loading = true
       const goods = this.goods
       if (this.dialogTip == 1) {
-        if (this.dowmUpBtnText == '下架') {
+        if (this.dowmUpBtnText === '下架') {
           updateGoodsState({
             goodsId: goods._id,
             goodsState: '已下架'
@@ -144,7 +143,7 @@ export default {
             type: 'success'
             })
           })
-        } else if (this.dowmUpBtnText == '上架') {
+        } else if (this.dowmUpBtnText === '上架') {
           updateGoodsState({
             goodsId: goods._id,
             goodsState: '已上架'
@@ -158,7 +157,7 @@ export default {
             })
           })
         }
-      } else if (this.dialogTip == 2) {
+      } else if (this.dialogTip === 2) {
         del({
           deletePic: goods,
           deleteType: 1,

@@ -16,19 +16,11 @@
         <template slot-scope="scope">
           <el-button size="mini" @click="onAddXinBean(scope.row)">新增鑫豆</el-button>
           <el-button size="mini" @click="onAddGrowthValue(scope.row)">新增成长值</el-button>
-          <el-button size="mini" type="primary" @click="onDel(scope.row)">查看详情</el-button>
+          <el-button size="mini" type="primary" @click="onUserDetail(scope.row)">查看详情</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <!-- 确认删除的对话框 -->
-    <el-dialog title="提示" :visible.sync="delDialogVisible" width="30%">
-      <span>确定删除该歌单吗</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="delDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="doDel">确 定</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -42,9 +34,6 @@ export default {
       userlist: [],
       count: 50,
       loading: false,
-      // 删除用户的对话框是否显示
-      delDialogVisible: false,
-      info: {},
       addTelephone: '',
       searchTelephone: ''
     }
@@ -65,7 +54,6 @@ export default {
         start: this.userlist.length,
         count: this.count
       }).then((res) => {
-        console.log(res)           // 获取到所有的用户数据
         this.userlist = this.userlist.concat(res.data)
         if (res.data.length < this.count) {                      // 当上拉回调的数据量小于 count 值时，说明数据全部请求完了，就不需要再请求了
           scroll.end()
@@ -78,30 +66,27 @@ export default {
     addUser() {
       const phone = this.addTelephone
       if(phone.length != 11) {
-        alert('电话号码格式不对')
+        this.alertMessage(2, '电话号码格式不对')
       } else {
-        console.log(`新增号码为: ${this.addTelephone}`)
         fetchUserByTelephone({                                  // 根据输入的电话号码查找该电话号码是否已存在
           telephone: phone
         }).then((res) => {
           if(res.data.length === 0) {
-            console.log('当前号码未注册')
-            // 插入这条记录
+            // 当前号码未注册 插入这条记录
             addUser({
               telephone: phone
             }).then((res) => {
-              if(res.code == 20000) {                           // 这个判断存疑
-                alert('新增营员成功')
+              if(res.code === 20000) {                           // 这个判断存疑
+                this.alertMessage(1, '新增营员成功')
                 this.addTelephone = ''
                 // 重新刷新列表数据
                 this.getUserList()
               } else {
-                alert('新增失败，请重新尝试')
+                this.alertMessage(4, '新增失败，请重新尝试')
               }
             })
           } else {
-            console.log('当前号码已注册')
-            alert('当前号码已存在')
+            this.alertMessage(1, '当前号码已存在')
           }
         })
       }
@@ -115,28 +100,51 @@ export default {
       this.$router.push(`/user/addGrowthValue/${row._id}`)              // 跳转到新增成长值页面
     },
 
+    onUserDetail(row) {
+      // 查看详情
+    },
+
     findUser() {
       const phone = this.searchTelephone
-      console.log(`swiperPictureId type = ${Object.prototype.toString.call(this.searchTelephone)}`)
-      console.log(`phone type = ${Object.prototype.toString.call(phone)}`)
       if(phone.length != 11) {
-        alert('电话号码格式不对')
+        this.alertMessage(2, '电话号码格式不对')
       } else {
-        console.log(`要查找电话号码为: ${phone}`)
         fetchUserByTelephone({
           telephone: phone
         }).then((res) => {
           if(res.data.length === 0) {
-            console.log('当前号码不存在')
-            this.$message.error('当前号码不存在')
+            this.alertMessage(2, '当前号码不存在')
           } else {
-            console.log(`当前号码已存在: ${res.data}`)
-            console.log(`当前号码已存在: ${JSON.parse(res.data)}`)
             this.userlist = []
             this.userlist.push(JSON.parse(res.data))
           }
         })
       }
+    },
+
+    // 弹出消息提醒
+    alertMessage(type, msg) {
+      var msgType
+      switch(type) {
+        case 1:
+          msgType = 'success'
+          break
+        case 2:
+          msgType = 'warning' 
+          break
+        case 3:
+          msgType = 'info'
+          break
+        case 4:
+          msgType = 'error'
+          break
+        default:
+          break     
+      }
+      this.$message({
+        message: msg,
+        type: msgType
+      })
     },
   },
 }

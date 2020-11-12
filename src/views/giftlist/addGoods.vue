@@ -126,7 +126,7 @@
 </template>
 
 <script>
-import { fetchFirstPictureList, fetchBigPictureList, fetchDetailPictureList, del, fetchGoodsTypeList, fetchNewGoods, fetchSmallPictureList } from '@/api/goods'
+import { fetchFirstPictureList, fetchBigPictureList, del, fetchGoodsTypeList, fetchNewGoods, fetchSmallPictureList } from '@/api/goods'
 export default {
   data() {
     return {
@@ -160,9 +160,6 @@ export default {
   created() {
     // 获取商品的分类列表数据
     fetchGoodsTypeList().then((res) => {
-      console.log(`fetchGoodsTypeList res = ${res}`)
-      console.log(`fetchGoodsTypeList res.data = ${res.data}`)
-      console.log(`fetchGoodsTypeList res.data.length = ${res.data.length}`)
       this.goodsTypeList = res.data
     }).catch((err) => {
       console.error(`fetchGoodsTypeList err = ${err}`)
@@ -228,15 +225,13 @@ export default {
     // 删除商品首图
     onFirstPictureDelete(row) {
       this.deletePicture = row
-      console.log(`onDetail deletePicture = ${JSON.stringify(this.deletePicture)}`)
       this.delDialogVisible = true
       this.currentDeleteType = 1
       this.deletePictureTips = '警告!!! 删除商品首图将删除该商品的全部信息，请慎重选择'
     },
-    // 删除商品小图
+    // 删除商品小图(后来添加的代码，所以标志位为 3，这里没错)
     onsmallPictureDelete(row) {
       this.deletePicture = row
-      console.log(`onsmallPictureDelete deletePicture = ${JSON.stringify(this.deletePicture)}`)
       this.delDialogVisible = true
       this.currentDeleteType = 3
       this.deletePictureTips = '确定删除该图片吗?'
@@ -244,7 +239,6 @@ export default {
     // 删除商品大图
     onBigPictureDelete(row) {
       this.deletePicture = row
-      console.log(`onDetail deletePicture = ${JSON.stringify(this.deletePicture)}`)
       this.delDialogVisible = true
       this.currentDeleteType = 2
       this.deletePictureTips = '确定删除该图片吗?'
@@ -265,14 +259,15 @@ export default {
         }).then((res) => {
           this.firstPictureLoading = false
           this.getFirstPictureList()
+          this.getSmallPictureList()
           this.getBigPictureList()
           this.firstPicture = []
           this.alertMessage(1, '删除成功')
           // 将上传按钮设置为可用
           this.FirstPictureDisabled = false
           this.FirstPictureBtnText = '点击上传'
-          // 回到商品列表页面, 这里后续要修改，不需要回到上一页，只清除当前页的数据就好
-          // this.$router.push('/gift/giftlist')
+          this.smallPictureDisabled = false
+          this.smallPictureBtnText = '点击上传'
         })
       } else if (currentDeleteType == 2) {
         // 删除商品大图
@@ -319,15 +314,15 @@ export default {
       const specification = this.newGoods.specification
       const description = this.newGoods.description
       let goodsTypeId = ''
-      if (goodsName == '') {
+      if (goodsName === '') {
         this.alertMessage(2, '商品名称不能为空')
         return
       }
-      if (goodsPrice == '') {
+      if (goodsPrice === '') {
         this.alertMessage(2, '商品价格不能为空')
         return
       }
-      if (type == "") {
+      if (type === "") {
         this.alertMessage(2, '商品类型不能为空')
         return
       } else {
@@ -353,27 +348,31 @@ export default {
             return   
         }
       }
-      if (brand == "") {
+      if (brand === "") {
         this.alertMessage(2, '商品品牌不能为空')
         return
       }
-      if (model == "") {
+      if (model === "") {
         this.alertMessage(2, '商品型号不能为空')
         return
       }
-      if (specification == "") {
+      if (specification === "") {
         this.alertMessage(2, '商品规格不能为空')
         return
       }
-      if (description == "") {
+      if (description === "") {
         this.alertMessage(2, '商品描述不能为空')
         return
       }
-      if (this.firstPicture.length == 0) {
+      if (this.firstPicture.length === 0) {
         this.alertMessage(2, '商品首图不能为空')
         return
       }
-      if (this.bigPictureList.length == 0) {
+      if (this.smallPicture.length === 0) {
+        this.alertMessage(2, '商品小图不能为空')
+        return
+      }
+      if (this.bigPictureList.length === 0) {
         this.alertMessage(2, '商品大图不能为空')
         return
       }
@@ -387,7 +386,6 @@ export default {
         specification: specification,
         description: description
       }).then((res) => {
-        console.log(`res.data.length = ${res.data.length}`)
         this.alertMessage(1, '新增商品成功')
         this.$router.push('/gift/giftlist')
       })

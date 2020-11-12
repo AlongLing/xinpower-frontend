@@ -98,7 +98,7 @@
 </template>
 
 <script>
-import { fetchSwiperHomeList, fetchBigPictureList, fetchDetailPictureList, del, fetchNewGoods } from '@/api/swiper'
+import { fetchSwiperHomeList, fetchBigPictureList, del, fetchNewGoods } from '@/api/swiper'
 import { fetchGoodsTypeList } from '@/api/goods'
 export default {
   data() {

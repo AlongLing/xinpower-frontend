@@ -7,11 +7,15 @@
       <el-form-item label="商品价格">
         <el-input v-model="newGoods.price" placeholder="请输入商品价格 格式：9999" type="number"></el-input>
       </el-form-item>
-      <el-form-item>
-        说明：请输入商品类型前的序号：1 数码电子；2 养生达人；3 差旅休闲；4 定制服务; 5 华鑫定制
-      </el-form-item>
       <el-form-item label="商品类型">
-        <el-input v-model="newGoods.type" placeholder="请输入商品类型序号" type="number"></el-input>
+        <el-checkbox-group v-model="checkList">
+          <el-checkbox label="1">数码电子</el-checkbox>
+          <el-checkbox label="2">养生达人</el-checkbox>
+          <el-checkbox label="3">商务差旅</el-checkbox>
+          <el-checkbox label="4">运动健康</el-checkbox>
+          <el-checkbox label="5">休闲娱乐</el-checkbox>
+          <el-checkbox label="6">华鑫定制</el-checkbox>
+      </el-checkbox-group>
       </el-form-item>
       <el-form-item label="品牌">
         <el-input v-model="newGoods.brand" placeholder="请输入商品品牌"></el-input>
@@ -133,7 +137,6 @@ export default {
       newGoods: {
         name: "",
         price: "",
-        type: "",                       // 分类类型
         brand: "",                      // 品牌
         model: "",                      // 型号
         specification: "",              // 规格
@@ -153,7 +156,8 @@ export default {
       smallPictureDisabled: false,
       smallPictureBtnText: '点击上传',
       smallPictureLoading: false,
-      smallPicture: []                             // 这里用数组其实只是匹配格式，实际只用到了第一个对象          
+      smallPicture: [],                             // 这里用数组其实只是匹配格式，实际只用到了第一个对象
+      checkList: []                                 // 用户勾选的商品分类          
     }
   },
 
@@ -308,12 +312,12 @@ export default {
     onGoodsSubmit() {
       const goodsName = this.newGoods.name
       const goodsPrice = this.newGoods.price
-      const type = this.newGoods.type
       const brand = this.newGoods.brand
       const model = this.newGoods.model
       const specification = this.newGoods.specification
       const description = this.newGoods.description
-      let goodsTypeId = ''
+      const checkList = this.checkList
+      var goodsTypeId = ''
       if (goodsName === '') {
         this.alertMessage(2, '商品名称不能为空')
         return
@@ -322,32 +326,21 @@ export default {
         this.alertMessage(2, '商品价格不能为空')
         return
       }
-      if (type === "") {
-        this.alertMessage(2, '商品类型不能为空')
+      if (checkList.length === 0) {
+        this.alertMessage(2, '请选择商品类型')
         return
       } else {
-        const typeIndex = parseInt(type)
-        switch (typeIndex) {
-          case 1:
-            goodsTypeId = JSON.parse(this.goodsTypeList[1])._id
-            break
-          case 2:
-            goodsTypeId = JSON.parse(this.goodsTypeList[2])._id
-            break
-          case 3:
-            goodsTypeId = JSON.parse(this.goodsTypeList[3])._id
-            break
-          case 4:
-            goodsTypeId = JSON.parse(this.goodsTypeList[4])._id
-            break
-          case 5:
-            goodsTypeId = JSON.parse(this.goodsTypeList[5])._id
-            break
-          default:
-            this.alertMessage(4, '商品类型不合法')
-            return   
+        for (let i = 0; i < checkList.length; i++) {
+          const typeId = JSON.parse(this.goodsTypeList[parseInt(checkList[i])])._id
+          console.log(`onGoodsSubmit typeId = ${typeId}`)
+          if (i === (checkList.length - 1)) {
+            goodsTypeId = goodsTypeId + typeId
+          } else {
+            goodsTypeId = goodsTypeId + typeId + ','
+          }
         }
       }
+      console.log(`onGoodsSubmit goodsTypeId = ${goodsTypeId}`)
       if (brand === "") {
         this.alertMessage(2, '商品品牌不能为空')
         return

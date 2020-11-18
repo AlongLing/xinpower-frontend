@@ -9,13 +9,13 @@
       </el-form-item>
       <el-form-item label="商品类型">
         <el-checkbox-group v-model="checkList">
-          <el-checkbox label="1">数码电子</el-checkbox>
+          <el-checkbox label="1">电子数码</el-checkbox>
           <el-checkbox label="2">养生达人</el-checkbox>
           <el-checkbox label="3">商务差旅</el-checkbox>
           <el-checkbox label="4">运动健康</el-checkbox>
           <el-checkbox label="5">休闲娱乐</el-checkbox>
           <el-checkbox label="6">华鑫定制</el-checkbox>
-      </el-checkbox-group>
+        </el-checkbox-group>
       </el-form-item>
       <el-form-item label="品牌">
         <el-input v-model="newGoods.brand" placeholder="请输入商品品牌"></el-input>

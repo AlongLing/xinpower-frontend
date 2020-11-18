@@ -66,7 +66,6 @@ export default {
   methods: {
     getSwiperHomeList() {
       this.loading = true
-      console.log(`getSwiperHomeList goodsState = ${this.goodsState}`)
       fetchSwiperHomeList({
         goodsState: this.goodsState
       }).then(res => {
@@ -147,7 +146,7 @@ export default {
         del({
           deletePic: deletePicture,
           deleteType: 1,
-          deletePictureId: deletePicture._id
+          deleteGoodsId: deletePicture._id
         }).then((res) => {
           this.loading = false
           this.getSwiperHomeList()

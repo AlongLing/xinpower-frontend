@@ -1,10 +1,18 @@
 import request from '@/utils/request'
 const baseURL = 'http://localhost:3000'
 
-export function fetchSwiperHomeList(params){
+export function fetchFirstPictureList(params){
     return request({
         params,
-        url: `${baseURL}/swiper/homelist`,
+        url: `${baseURL}/swiper/firstPictureList`,
+        method: 'get'
+    })
+}
+
+export function fetchSmallPictureList(params) {
+    return request({
+        params,
+        url: `${baseURL}/swiper/smallPictureList`,
         method: 'get'
     })
 }
@@ -50,4 +58,13 @@ export function updateSwiperGoodsState(params) {
         url: `${baseURL}/swiper/updateSwiperGoodsState`,
         method: 'post',
     })
+}
+
+// 获取所有轮播商品列表
+export function fetchSwiperHomeList(params) {
+    return request({
+        params,
+        url: `${baseURL}/swiper/getSwiperHomeList`,
+        method: 'get',
+      })
 }

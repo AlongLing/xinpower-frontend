@@ -14,7 +14,7 @@
           <el-checkbox label="3">商务差旅</el-checkbox>
           <el-checkbox label="4">运动健康</el-checkbox>
           <el-checkbox label="5">休闲娱乐</el-checkbox>
-          <el-checkbox label="6">华鑫定制</el-checkbox>
+          <el-checkbox label="6">专属定制</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="品牌">

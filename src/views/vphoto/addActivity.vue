@@ -11,7 +11,7 @@
                 placeholder="选择日期">
             </el-date-picker>
         </el-form-item>
-        <el-form-item label="活动海报">
+        <el-form-item label="活动首图">
           <div>
             <div class="filter-container">
               <el-upload
@@ -39,6 +39,34 @@
             </el-table>
           </div>
         </el-form-item>
+        <el-form-item label="活动大图">
+          <div>
+            <div class="filter-container">
+              <el-upload
+              class="upload-demo"
+              action="http://localhost:3000/vphoto/uploadBigPicture"
+              :on-success="uploadBigPictureSuccess"
+              :disabled="uploadBigPictureDisabled"
+              :show-file-list="false"
+            >
+              <el-button size="small" type="primary">{{uploadBigPictureText}}</el-button>
+              <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且只能上传一张</div>
+            </el-upload>
+            </div>
+            <el-table v-loading="posterBigPictureLoading" :data="vphotoBigPicture" stripe style="width: 100%">
+              <el-table-column label="图片" width="400">
+                <template slot-scope="scope">
+                  <img :src="scope.row.download_url" alt height="50" />
+                </template>
+              </el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scope">
+                  <el-button size="mini" type="danger" @click="onBigPictureDelete(scope.row)">删除</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </el-form-item>
         <el-form-item>
             <el-button type="primary" @click="onVphotoSubmit">确定</el-button>
             <el-button @click="onVphotoCancel">取消</el-button>
@@ -57,7 +85,7 @@
 </template>
 
 <script>
-import { updateVphotoById, fetchVphotoById, deleteVphotoById } from '@/api/vphoto'
+import { updateVphotoById, fetchVphotoById, fetchBigPictureById, deleteVphotoById } from '@/api/vphoto'
 export default {
   data() {
     return {
@@ -71,7 +99,11 @@ export default {
       vphotoPicture: [],                                // 这里用数组其实只是匹配格式，实际只用到了第一个对象
       delDialogVisible: false,
       deleteVphoto: {},                                  // 待删除的活动
-      vphotoId: ''                                       // 新创建的vphoto的_id
+      vphotoId: '',                                       // 新创建的vphoto的_id
+      uploadBigPictureDisabled: false,
+      uploadBigPictureText: '点击上传',
+      posterBigPictureLoading: false,
+      vphotoBigPicture: [],
     }
   },
 
@@ -86,7 +118,7 @@ export default {
       this.uploadPosterText = '已上传'
       this.vphotoId = res.data.id_list[0]
       console.log(`uploadPosterSuccess this.vphotoId = ${this.vphotoId}`)
-      // 根据id查找对应的vphoto，显示海报图片
+      // 根据id查找对应的活动，显示海报图片
       fetchVphotoById({
         vphotoId: this.vphotoId
       }).then((res) => {
@@ -94,17 +126,37 @@ export default {
         this.posterLoading = false
       })
     },
+
+    // 上传活动大图成功
+    uploadBigPictureSuccess(res) {
+      this.posterBigPictureLoading = true
+      this.uploadBigPictureDisabled = true
+      this.uploadBigPictureText = '已上传'
+      fetchBigPictureById({
+        vphotoId: this.vphotoId
+      }).then((res) => {
+        this.vphotoBigPicture = res.data
+        this.posterBigPictureLoading = false
+      })
+    },
+
     // 海报删除按钮
     onPosterDelete(row) {
       this.deleteVphoto = row
       this.delDialogVisible = true
     },
+
+    // 删除活动大图
+    onBigPictureDelete(row) {
+
+    },
+
     // 保存新增的活动信息
     onVphotoSubmit() {
       const name = this.vphoto.name
       const date = Date.parse(this.vphoto.date)
       const uploadDisabled = this.uploadDisabled
-      console.log(`onVphotoSubmit name = ${name}, date = ${date}`)
+      const uploadBigPictureDisabled = this.uploadBigPictureDisabled
       if (name == '') {
         this.$message({
           message: '活动主题不能为空',
@@ -121,12 +173,19 @@ export default {
       }
       if (!uploadDisabled) {
         this.$message({
-          message: '请上传活动海报',
+          message: '请上传活动首图',
           type: 'warning'
         })
         return
-      } else {
-        updateVphotoById({
+      }
+      if (!uploadBigPictureDisabled) {
+        this.$message({
+          message: '请上传活动大图',
+          type: 'warning'
+        })
+        return
+      }
+      updateVphotoById({
           vphotoId: this.vphotoId,
           name: name,
           date: date
@@ -137,17 +196,23 @@ export default {
           })
           this.$router.push('/vphoto/vphotoMenu')
         })
-      }
     },
     // 取消
     onVphotoCancel() {
-      if (this.uploadDisabled) {
+      if (this.uploadDisabled && this.uploadBigPictureDisabled == false) {
         // 需要删除刚刚新创建的活动
         deleteVphotoById({
           vphotoId: this.vphotoId,
           deleteVphoto: this.vphotoPicture[0]
         }).then((res) => {
           this.$router.push('/vphoto/vphotoMenu')
+        })
+      } else if (this.uploadDisabled && this.uploadBigPictureDisabled) {
+        // 需要删除刚刚新创建的活动
+        deleteVphotoAndBigPictureById({
+          vphotoId: this.vphotoId,
+          deleteVphoto: this.vphotoPicture[0],
+          deleteBigPicture: this.vphotoBigPicture[0]
         })
       } else {
         this.$router.push('/vphoto/vphotoMenu')

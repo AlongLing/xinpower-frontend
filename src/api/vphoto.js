@@ -63,11 +63,29 @@ export function fetchVphotoById(params) {
   })
 }
 
-// 删除vphoto实例以及对应的海报
+// 根据 _id 查找 活动大图并显示出来
+export function fetchBigPictureById(params) {
+  return request({
+    params,
+    url: `${baseURL}/vphoto/getBigPictureById`,
+    method: 'get',
+  })
+}
+
+// 删除vphoto实例以及对应的首图和大图
 export function deleteVphotoById(params) {
   return request({
     params,
     url: `${baseURL}/vphoto/deleteVphotoById`,
+    method: 'get',
+  })
+}
+
+// 删除vphoto实例以及对应的首图和大图
+export function deleteVphotoAndBigPictureById(params) {
+  return request({
+    params,
+    url: `${baseURL}/vphoto/deleteVphotoAndBigPictureById`,
     method: 'get',
   })
 }

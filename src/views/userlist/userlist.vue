@@ -70,7 +70,7 @@ export default {
       const currentYear = new Date().getFullYear()
       for (let i = 0; i < userlist.length; i++) {
         const user = userlist[i]
-        if (currentTime > user.indate) {
+        if (currentTime > user.indate && user.indate !== 0) {
           console.log(`before i = ${i}`)
           // 过了用户的有效期
           const nextYear = currentYear + 1

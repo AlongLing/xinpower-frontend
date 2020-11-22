@@ -2,16 +2,16 @@
     <div>
     <el-form ref="form" :model="user" label-width="120px">
       <el-form-item label="用户名">
-        <el-input v-model="user.userName" :disabled="true"></el-input>
+        <el-input v-model="user.userName" :disabled="true" type="text"></el-input>
       </el-form-item>
       <el-form-item label="电话号码">
-        <el-input v-model="user.telephone" :disabled="true"></el-input>
+        <el-input v-model="user.telephone" :disabled="true" type="number"></el-input>
       </el-form-item>
       <el-form-item label="是否注册">
-        <el-input v-model="user.hasRegister" :disabled="true"></el-input>
+        <el-input v-model="hasRegister" :disabled="true" type="text"></el-input>
       </el-form-item>
       <el-form-item label="当前鑫豆">
-        <el-input v-model="user.score" :disabled="true"></el-input>
+        <el-input v-model="user.score" :disabled="true" type="number"></el-input>
       </el-form-item>
       <el-form-item label="新增鑫豆">
         <el-input placeholder="0" v-model="addScore" clearable type="number"></el-input>
@@ -43,6 +43,7 @@ import { fetchUserById, updateScoreById, deleteUser } from '@/api/userlist'
 export default {
   data() {
     return {
+      hasRegister: '否',
       user: {},
       reason: '',
       addScore: 0,
@@ -54,10 +55,26 @@ export default {
       id: this.$route.params.id,
     }).then((res) => {
       this.user = res.data
+      if (this.user.hasRegister) {
+        this.hasRegister = '是'
+      } else {
+        this.hasRegister = '否'
+      }
     })
   },
   methods: {
     onSubmit() {
+      const indateYear = new Date(this.user.indate).getFullYear()
+      const currentYear = new Date().getFullYear()
+      const currentTime = Date.parse(new Date())
+      const record = '+' + parseInt(this.addScore)
+      var lastYearScore = this.user.lastYearScore
+
+      if (currentYear < indateYear) {
+        // 当前是上一年，需要记录增加的积分
+        lastYearScore = lastYearScore + parseInt(this.addScore)
+      }
+
       const score = parseInt(this.user.score) + parseInt(this.addScore)
       const reason = this.reason
       if (reason === '' || reason === undefined) {
@@ -69,8 +86,10 @@ export default {
         updateScoreById({
           id: this.user._id,
           score: score,
-          addScore: this.addScore,
-          reason: reason
+          lastYearScore: lastYearScore,
+          currentTime: currentTime,
+          reason: reason,
+          record: record
         }).then((res) => {
           if (res.code === 20000) {
             this.$message({

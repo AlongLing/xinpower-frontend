@@ -73,3 +73,12 @@ export function deleteUser(params) {
     method: 'get'
   })
 }
+
+// 过了有效期，更新用户的有效期
+export function updateUserIndateById(params) {
+  return request({
+    params,
+    url: `${baseURL}/userlist/updateUserIndateById`,
+    method: 'post'
+  })
+}

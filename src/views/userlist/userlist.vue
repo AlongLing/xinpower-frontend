@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { fetchUserList, fetchUserByTelephone, addUser } from '@/api/userlist'                          // 导入对应的 api 的函数
+import { fetchUserList, fetchUserByTelephone, addUser, updateUserIndateById, updateScoreById } from '@/api/userlist'                          // 导入对应的 api 的函数
 import scroll from '@/utils/scroll'
 
 export default {
@@ -59,7 +59,47 @@ export default {
           scroll.end()
         }
         this.loading = false
+        this.updateUserInfo()
       })
+    },
+
+    // 用户有效期到了时更新用户信息
+    async updateUserInfo() {
+      const userlist = this.userlist
+      const currentTime = Date.parse(new Date())
+      const currentYear = new Date().getFullYear()
+      for (let i = 0; i < userlist.length; i++) {
+        const user = userlist[i]
+        if (currentTime > user.indate) {
+          console.log(`before i = ${i}`)
+          // 过了用户的有效期
+          const nextYear = currentYear + 1
+          const indate = Date.parse(new Date(nextYear + '/12/31 23:59:59'))
+          const lastYearScorePre = user.lastYearScore
+          const score = user.score - lastYearScorePre
+          const lastYearScore = score
+          await updateUserIndateById({
+            id: user._id,
+            indate: indate
+          }).then((res) => {
+            // 更新成功
+            console.log(`after i = ${i}`)
+          })
+          // 更新鑫豆记录
+          const reason = lastYearScorePre + '鑫豆已过有效期'
+          const record = '-' + lastYearScorePre
+          await updateScoreById({
+            id: user._id,
+            score: score,
+            lastYearScore: lastYearScore,
+            currentTime: currentTime,
+            reason: reason,
+            record: record
+          }).then((res) => {
+            // 新增一条鑫豆记录成功
+          })
+        }
+      }
     },
 
     // 新增营员

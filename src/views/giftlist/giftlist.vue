@@ -67,7 +67,7 @@ export default {
   },
 
   mounted() {
-    scroll.start(this.getGoodsList)
+    // scroll.start(this.getGoodsList)
   },
 
   methods: {
@@ -79,9 +79,10 @@ export default {
         count: this.count,
         goodsState: this.goodsState
       }).then((res) => {
+        console.log(`res.data.length = ${res.data.length}`)
         this.goodsList = this.goodsList.concat(res.data)
-        if (res.data.length < this.count) {                      // 当上拉回调的数据量小于 count 值时，说明数据全部请求完了，就不需要再请求了
-          scroll.end()
+        if (res.data.length <= this.count && res.data.length !== 0) {                      // 当上拉回调的数据量小于 count 值时，说明数据全部请求完了，就不需要再请求了
+          this.getGoodsList()
         }
         this.loading = false
       })

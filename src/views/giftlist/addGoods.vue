@@ -130,7 +130,7 @@
 </template>
 
 <script>
-import { fetchFirstPictureList, fetchBigPictureList, del, fetchGoodsTypeList, fetchNewGoods, fetchSmallPictureList } from '@/api/goods'
+import { fetchFirstPictureList, fetchBigPictureList, del, fetchGoodsTypeList, fetchNewGoods, fetchSmallPictureList, fetchGoodsById } from '@/api/goods'
 export default {
   data() {
     return {
@@ -142,7 +142,7 @@ export default {
         specification: "",              // 规格
         description: ""                 // 描述 
       },
-      firstPictureLoading: false,
+      firstPictureLoading: false, 
       firstPicture: [],                           // 这里用数组其实只是匹配格式，实际只用到了第一个对象
       FirstPictureBtnText: '点击上传',
       FirstPictureDisabled: false,
@@ -162,6 +162,17 @@ export default {
   },
 
   created() {
+    const id = this.$route.params.id
+    if (id == 0) {
+      // 新增商品
+    } else {
+      // 修改商品
+      fetchGoodsById({
+        goodsId: id
+      }).then((res) => {
+        // 根据 id 获取商品信息，不包括图片
+      })
+    }
     // 获取商品的分类列表数据
     fetchGoodsTypeList().then((res) => {
       this.goodsTypeList = res.data

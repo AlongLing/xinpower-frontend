@@ -91,6 +91,7 @@ import { fetchPictureListById, updateVphotoId, updatePictureInfo, del } from '@/
         }).then((res) => {
           this.pictureList = []
           const list = res.data
+          console.log(`fetchPictureListById list.length = ${list.length}`)
           var listTemp = []
           for (let i = list.length - 1; i >= 0; i--) {
             listTemp.push(list[i])

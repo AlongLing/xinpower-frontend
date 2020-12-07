@@ -29,6 +29,7 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button size="mini" type="primary" @click="updateGoodsState(scope.row)">{{dowmUpBtnText}}</el-button>
+          <el-button size="mini" type="primary" @click="editGoods(scope.row)">编辑</el-button>
           <el-button size="mini" type="danger" @click="onGoodsDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -100,6 +101,12 @@ export default {
       this.goods = row
       this.dialogVisible = true
     },
+
+    // 编辑商品
+    editGoods(row) {
+      this.$router.push(`/gift/addGoods/${row._id}`)              // 跳转到新增商品页面，如果id=0，则新增，id != 0,则修改
+    },
+
     // 删除按钮
     onGoodsDelete(row) {
       this.dialogTitle = '确定删除该商品吗？'
@@ -123,7 +130,7 @@ export default {
     },
     // 新增商品
     addGoods() {
-      this.$router.push('/gift/addGoods')                               // 跳转到新增商品界面，需要在 router/index.js 中注册
+      this.$router.push('/gift/addGoods/0')                              // 跳转到新增商品界面，需要在 router/index.js 中注册
     },
     // 商品删除或下架对话框确定按钮
     dialogConfirm() {

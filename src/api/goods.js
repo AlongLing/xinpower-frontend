@@ -45,6 +45,15 @@ export function fetchBigPictureList(params) {
   })
 }
 
+// 根据商品_id获取商品信息，不包括图片
+export function fetchGoodsById(params) {
+  return request({
+    params,
+    url: `${baseURL}/goods/fetchGoodsById`,
+    method: 'get'
+  })
+}
+
 // 删除商品图片
 export function del(params) {
   return request({

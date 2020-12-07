@@ -120,6 +120,7 @@ export default {
 
     // 删除对话框确定按钮
     doDelete() {
+      console.log(`doDelete this.deleteVphoto._id = ${this.deleteVphoto._id}, this.deleteVphoto = ${JSON.stringify(this.deleteVphoto)}`)
       deleteVphotoById({
         vphotoId: this.deleteVphoto._id,
         deleteVphoto: this.deleteVphoto

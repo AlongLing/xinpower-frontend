@@ -32,7 +32,7 @@ export default {
   data() {
     return {
       userlist: [],
-      count: 50,
+      count: 100,
       loading: false,
       addTelephone: '',
       searchTelephone: ''
